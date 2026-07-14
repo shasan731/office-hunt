@@ -1,0 +1,20 @@
+{
+  "commute": [
+    "The bus discovered a parking spot in the middle of the road.",
+    "A colleague asked one quick question. Seven minutes disappeared.",
+    "Road construction shipped without documentation.",
+    "A puddle performed an unexpected splash test.",
+    "Traffic police deployed a barrier to production."
+  ],
+  "office": [
+    "The printer requires emotional support.",
+    "A meeting spawned another meeting.",
+    "The internet is taking a tea break.",
+    "Someone merged Friday directly into Monday.",
+    "The lift is downloading an update."
+  ],
+  "escape": [
+    "One small change", "Critical bug", "Client calling", "Surprise meeting",
+    "Wi-Fi password?", "Printer problem", "Production alert", "Quick help?"
+  ]
+}

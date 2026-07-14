@@ -1,0 +1,18 @@
+:root { color-scheme: dark; font-family: Inter, ui-rounded, "Trebuchet MS", Arial, sans-serif; background: #071a2b; }
+* { box-sizing: border-box; }
+html, body, #app, #game-container { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { background: radial-gradient(circle at 50% 20%, #123f57 0%, #071a2b 72%); touch-action: none; overscroll-behavior: none; }
+canvas { display: block; outline: none; }
+#game-container canvas:focus-visible { box-shadow: inset 0 0 0 5px #ffc857; }
+#rotate-message { display: none; position: fixed; z-index: 1000; inset: 0; place-items: center; padding: 2rem; text-align: center; color: #fff; background: #071a2b; font-size: 1.2rem; font-weight: 800; }
+.high-contrast { filter: contrast(1.18) saturate(1.12); }
+.large-text #rotate-message { font-size: 1.45rem; }
+@media (orientation: portrait) and (max-width: 540px) and (max-aspect-ratio: 3/5) { #rotate-message { display: grid; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+.name-form { width: 390px; display: grid; gap: 14px; padding: 26px; color: #071a2b; background: #eafcff; border: 4px solid #071a2b; box-shadow: 8px 8px 0 #39d8e8; font-family: Inter, Arial, sans-serif; }
+.name-form label { font-size: 18px; font-weight: 900; letter-spacing: 1px; }
+.name-form input { width: 100%; padding: 14px 16px; border: 4px solid #087ea4; outline: none; background: #fff; color: #071a2b; font: 800 22px Inter, Arial, sans-serif; }
+.name-form input:focus { border-color: #ff7a59; box-shadow: 0 0 0 4px #ffc857; }
+.name-form p { margin: 0; font-size: 14px; font-weight: 700; color: #425466; }
+.name-form button { padding: 15px; border: 3px solid #071a2b; background: #ff7a59; color: #fff; font: 900 18px Inter, Arial, sans-serif; cursor: pointer; }
+.name-form button:hover, .name-form button:focus-visible { background: #12b886; transform: translateY(-2px); }

@@ -1,0 +1,10 @@
+{
+  "name": "SoftifyBD: Salary Chase",
+  "short_name": "Salary Chase",
+  "description": "A colorful office adventure about surviving one workday.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071a2b",
+  "theme_color": "#087ea4",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

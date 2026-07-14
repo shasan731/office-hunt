@@ -1,0 +1,12 @@
+[
+  { "id": "dev", "role": "Developer", "dialogueKey": "developer", "color": 3499766 },
+  { "id": "qa", "role": "QA Engineer", "dialogueKey": "qa", "color": 16751675 },
+  { "id": "support", "role": "Support", "dialogueKey": "support", "color": 15844367 },
+  { "id": "accountant", "role": "Accountant", "dialogueKey": "accountant", "color": 10181046 },
+  { "id": "reception", "role": "Receptionist", "dialogueKey": "receptionist", "color": 16760882 },
+  { "id": "lead", "role": "Team Lead", "dialogueKey": "lead", "color": 4169571 },
+  { "id": "manager", "role": "Manager", "dialogueKey": "manager", "color": 14951490 },
+  { "id": "intern", "role": "Intern", "dialogueKey": "intern", "color": 8900331 },
+  { "id": "assistant", "role": "Office Assistant", "dialogueKey": "assistant", "color": 2323053 },
+  { "id": "hr", "role": "HR", "dialogueKey": "hr", "color": 16742912 }
+]

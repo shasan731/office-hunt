@@ -1,0 +1,15 @@
+{
+  "arrivalEarly": 500,
+  "arrivalOkay": 250,
+  "arrivalLate": -300,
+  "bugFixed": 150,
+  "codingMistake": -75,
+  "codingFast": 300,
+  "usefulClue": 50,
+  "findHrFast": 400,
+  "salary": 1000,
+  "exitBest": 500,
+  "exitLate": -250,
+  "managerCaught": -100,
+  "tea": -25
+}
