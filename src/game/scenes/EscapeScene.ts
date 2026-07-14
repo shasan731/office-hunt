@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { WORKDAY_SCHEDULE } from '../../config/constants';
 import events from '../../data/randomEvents.json';
 import { app } from '../managers/AppContext';
+import { addInteractionBeacon, burstParticles, impactFlash, juiceText, playPersonReaction, pulseObject } from '../effects';
 import { addPixelCabinet, addPixelDesk, addPixelDoor, addPixelPlant, drawPixelFloor } from '../pixelArt';
 import { SupportAttackSystem } from '../systems/SupportAttackSystem';
 import { addPerson, animatePerson, colors, textStyle } from '../ui';
@@ -22,6 +23,11 @@ export class EscapeScene extends BaseScene {
   private supportAttacks?: SupportAttackSystem;
   private hidden = false;
   private collisionCooldown = false;
+  private overrideSwitch?: Phaser.GameObjects.Container;
+  private exitUnlocked = false;
+  private trappedIntern?: Phaser.GameObjects.Container;
+  private internRescued = false;
+  private exitWarning = false;
 
   constructor() { super('EscapeScene'); }
 
@@ -32,13 +38,15 @@ export class EscapeScene extends BaseScene {
     this.supportAttacks = undefined;
     this.hidden = false;
     this.collisionCooldown = false;
-    this.setupWorld('LEVEL 7 / FINAL ESCAPE', 'Get out on time. Hide from support zombies and dodge roaming managers.', 110, 610);
+    this.overrideSwitch = undefined; this.exitUnlocked = false; this.trappedIntern = undefined; this.internRescued = false; this.exitWarning = false;
+    this.setupWorld('LEVEL 7 / FINAL ESCAPE', 'Hit the emergency exit override, then escape. Hide from support zombies and managers.', 110, 610);
     drawPixelFloor(this, 0xe8e2f2, 0xd8d0e7);
     for (let x = 260; x < 1100; x += 270) {
       addPixelDesk(this, x, 245, 155);
       addPixelDesk(this, x, 485, 155);
     }
     this.exit = addPixelDoor(this, 1170, 155, 'EXIT\nFREEDOM', colors.green);
+    pulseObject(this, this.exit);
     this.hideSpots = [
       addPixelCabinet(this, 180, 365, 'HIDE'),
       addPixelCabinet(this, 640, 160, 'HIDE'),
@@ -56,8 +64,17 @@ export class EscapeScene extends BaseScene {
       ).setDepth(10);
       this.traps.push({ person, label, manager: index === 0 || index === 3, active: true, direction: index % 2 ? -1 : 1 });
     });
-    this.add.text(620, 340, '7:00 PM\nTHE MOST DANGEROUS TEN MINUTES', { ...textStyle(23, '#071a2b'), align: 'center' }).setOrigin(0.5);
-    this.add.text(620, 395, 'HEADSETS DETECTED — BREAK LINE OF SIGHT AT A HIDE CABINET', textStyle(14, '#7c5ce7')).setOrigin(0.5);
+    this.add.rectangle(640, 103, 520, 22, colors.navy, 0.88).setStrokeStyle(2, colors.purple).setDepth(6);
+    this.add.text(640, 103, '7:00 PM - FREEDOM PROTOCOL ACTIVE', textStyle(11, '#d9eef7')).setOrigin(0.5).setDepth(7);
+    this.overrideSwitch = this.add.container(765, 350, [
+      this.add.rectangle(5, 6, 124, 76, colors.navy, 0.23),
+      this.add.rectangle(0, 0, 122, 74, 0x455a64).setStrokeStyle(5, colors.navy),
+      this.add.circle(0, -10, 20, 0xe53935).setStrokeStyle(4, colors.white),
+      this.add.text(0, 24, 'EXIT OVERRIDE', textStyle(10, '#ffffff')).setOrigin(0.5),
+    ]).setDepth(9);
+    pulseObject(this, this.overrideSwitch); addInteractionBeacon(this, 765, 290, 'PRESS', colors.orange);
+    this.trappedIntern = addPerson(this, 420, 350, colors.green, 'TRAPPED INTERN').setScale(0.82).setDepth(10);
+    addInteractionBeacon(this, 420, 276, 'RESCUE', colors.green);
     this.supportAttacks = new SupportAttackSystem(this, {
       getPlayer: () => this.player,
       isHidden: () => this.hidden || this.movementLocked,
@@ -90,6 +107,21 @@ export class EscapeScene extends BaseScene {
     if (this.exit && this.isNear(this.exit, 90)) this.finish();
   }
 
+  protected override interact(): void {
+    if (this.overrideSwitch && !this.exitUnlocked && this.isNear(this.overrideSwitch, 82)) {
+      this.exitUnlocked = true; this.overrideSwitch.setAlpha(0.5); app.state.addScore(125); app.audio.play('correct');
+      impactFlash(this, colors.green); burstParticles(this, this.overrideSwitch.x, this.overrideSwitch.y);
+      this.updateObjective('EXIT OVERRIDE ACTIVE! Reach the green freedom door before someone schedules tomorrow.');
+      this.showDialog('Emergency Exit Override', 'Door unlocked. Alarm: LEAVING ON TIME IS AN UNUSUAL ACTIVITY. Security has been emotionally notified.');
+      return;
+    }
+    if (this.trappedIntern && !this.internRescued && this.isNear(this.trappedIntern, 80)) {
+      this.internRescued = true; app.state.addScore(100); app.audio.play('correct');
+      playPersonReaction(this, this.trappedIntern, 'celebrate'); juiceText(this, this.trappedIntern.x, this.trappedIntern.y - 65, 'INTERN EVACUATED +100');
+      this.showDialog('Trapped Intern', 'Thank you! I was trapped between a reply-all chain and a mandatory optional survey. I will remember this until my contract ends Friday.');
+    }
+  }
+
   private hitTrap(trap: Trap): void {
     this.collisionCooldown = true;
     trap.active = false;
@@ -97,6 +129,7 @@ export class EscapeScene extends BaseScene {
     if (trap.manager) app.state.caughtByManager();
     else { app.state.hitMeeting(); app.state.changeEnergy(-7); }
     app.audio.play('warning');
+    if (this.player) playPersonReaction(this, this.player, trap.manager ? 'panic' : 'hit');
     this.showDialog(
       trap.manager ? 'Manager' : 'Office Trap',
       trap.manager
@@ -110,15 +143,26 @@ export class EscapeScene extends BaseScene {
   private caughtBySupport(): void {
     app.state.caughtBySupport();
     app.audio.play('warning');
+    if (this.player) playPersonReaction(this, this.player, 'hit');
     this.refreshHud();
     this.showDialog('Customer Support Zombie', '“Just one customer call…” The headset horde consumed three minutes and eight energy. Cabinets are your friends.');
   }
 
   private finish(): void {
     if (this.movementLocked || !app.state.snapshot.salaryCollected) return;
+    if (!this.exitUnlocked) {
+      if (!this.exitWarning) {
+        this.exitWarning = true;
+        this.showDialog('Freedom Door', 'LOCKED BY POLICY. Find the red emergency override near the center. It is labelled clearly, which is suspicious.', () => {
+          this.time.delayedCall(650, () => { this.exitWarning = false; });
+        });
+      }
+      return;
+    }
     this.movementLocked = true;
     const points = app.state.recordExit();
     app.audio.play('exit');
+    if (this.player) playPersonReaction(this, this.player, 'celebrate');
     if (app.state.snapshot.minutes >= WORKDAY_SCHEDULE.officeEnd && app.state.snapshot.minutes <= WORKDAY_SCHEDULE.officeEnd + 2) app.state.unlock('six-clock-ninja');
     if (app.state.snapshot.meetingsHit === 0) app.state.unlock('meeting-dodger');
     const message = app.state.snapshot.minutes <= WORKDAY_SCHEDULE.bestExitEnd

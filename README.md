@@ -2,19 +2,19 @@
 
 A colorful seven-level Phaser 3 office adventure. Commute by bus and boat, beat five flights of stairs, repair absurd code, survive office hazards, battle QA, hunt HR, collect a fictional salary, and escape before another meeting begins.
 
-The game uses an original 64-bit-retro visual style: richly layered programmatic sprites, colorful beveled environments, scanline polish, expressive characters, and no remote art assets. Level 1 randomly selects sunny, rainy, windy, or cloudy weather for the entire trip. Vehicle collisions remain fatal to the run and open a **You are late to the office** retry screen.
+The game uses an original high-fidelity 64-bit-retro visual style: layered programmatic sprites, pseudo-3D shading, atmospheric particles, animated lighting, scanline polish, expressive character states, impact flashes, screen shake, dust, confetti, and no remote art assets. Level 1 randomly selects sunny, rainy, windy, or cloudy weather for the entire trip. Vehicle collisions remain fatal to the run and open a **You are late to the office** retry screen.
 
 The complete game runs in the browser as a static Vite app—no backend, accounts, tracking, remote gameplay assets, or environment variables.
 
 ## Seven levels
 
-1. **The Commute** — Leave home, cross traffic to catch a bus, cross again for a boat, cross once more to the office, climb five stair flights, and mark attendance.
-2. **Coding and the Lunch Gauntlet** — Complete a random coding minigame, then hide from support zombies and angry managers. Getting caught launches a funny bug ticket or micro-meeting.
-3. **Lunch Maze** — Find the clean plate and an empty seat before the cafeteria timer expires. Timing out gives an HR warning but still unlocks Level 4.
-4. **QA Bug Bash** — Play all three Developer-vs-Software-Tester rounds and win at least two.
-5. **Hot Tea Maze** — Find hot water, a tea bag, and sugar in order. Timing out unlocks Level 6 without tea or its energy bonus.
-6. **Hunt HR** — Search the full office, gather funny clues, avoid support zombies, catch moving HR, and survive the salary questionnaire.
-7. **Final Escape** — Leave on time while hiding from support zombies and navigating around roaming managers.
+1. **The Commute** — Leave home, cross traffic to catch a bus, cross again for a boat, cross once more to the office, discover transit-token secrets, climb five stair flights, and mark attendance.
+2. **Coding and the Lunch Gauntlet** — Complete a random coding minigame, find the cafeteria keycard, use a runaway chair or manager-meeting trap, and hide from support zombies. Getting caught launches a funny bug ticket or micro-meeting.
+3. **Lunch Maze** — Explore a larger branching cafeteria, find the clean plate and empty seat, open a wall shortcut, rescue a lost intern, and discover the forbidden golden spoon. Timing out gives an HR warning but still unlocks Level 4.
+4. **QA Bug Bash** — Play a three-round arena fighter with animated crowds, attacks, blocks, hit reactions, spotlights, and win celebrations. Win at least two rounds.
+5. **Hot Tea Maze** — Power the kettle, find hot water, tea, and sugar in order, trade with the Tea Sage for a shortcut, and risk a runaway snack-trolley boost. Timing out unlocks Level 6 without tea or its energy bonus.
+6. **Hunt HR** — Search the full office, gather funny clues, avoid support zombies, solve the haunted-printer puzzle, catch moving HR, and survive the salary questionnaire.
+7. **Final Escape** — Trigger the emergency exit override, optionally rescue an intern, then leave on time while hiding from support zombies and navigating around roaming managers.
 
 Each level locks the next until its completion condition is met. A timeout counts as completion only in the lunch and tea mazes, exactly as described above.
 
@@ -76,6 +76,7 @@ The production output is written to `dist/`.
 ## Controls and accessibility
 
 - Move: Arrow keys or WASD
+- Run: Hold Shift
 - Interact: E or Space
 - Bug Bash: A/D to move, J or Space to punch, K to kick, S or Down Arrow to block
 - Pause: Escape
@@ -127,7 +128,7 @@ The included `vercel.json` supplies the same static settings. No secrets are req
 
 ## Architecture
 
-Scenes are separated under `src/game/scenes`; state, persistence, time, and audio live under `src/game/managers`; scoring and achievements live under `src/game/systems`; shared types and UI helpers are isolated. Environments and characters are drawn with Phaser primitives, so gameplay never waits on remote images.
+Scenes are separated under `src/game/scenes`; state, persistence, time, and audio live under `src/game/managers`; scoring and achievements live under `src/game/systems`; shared types and UI helpers are isolated. `src/game/effects.ts` centralizes reactions, particles, interaction beacons, scene intros, ambient motion, impact flashes, and visual feedback. Environments and characters are drawn with Phaser primitives, so gameplay never waits on remote images.
 
 ## License and disclaimer
 

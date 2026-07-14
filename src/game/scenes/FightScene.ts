@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { WORKDAY_SCHEDULE } from '../../config/constants';
 import { app } from '../managers/AppContext';
+import { burstParticles, createAmbientMotes, impactFlash } from '../effects';
 import { FIGHT_BALANCE, applyFightDamage, developerWinsRound } from '../systems/FightSystem';
 import { addButton, applyPixelPolish, colors, textStyle } from '../ui';
 
@@ -71,6 +72,7 @@ export class FightScene extends Phaser.Scene {
       },
     });
     applyPixelPolish(this, colors.orange);
+    createAmbientMotes(this, [colors.orange, colors.yellow, colors.purple], 28);
   }
 
   update(time: number, delta: number): void {
@@ -134,6 +136,12 @@ export class FightScene extends Phaser.Scene {
     graphics.fillStyle(colors.navy).fillRect(90, 646, 1100, 7);
 
     this.add.rectangle(640, 177, 690, 116, 0x071a2b, 0.92).setStrokeStyle(5, colors.orange);
+    const leftLight = this.add.triangle(250, 300, -95, 210, 95, 210, 0, -260, colors.cyan, 0.09).setDepth(-5);
+    const rightLight = this.add.triangle(1030, 300, -95, 210, 95, 210, 0, -260, colors.orange, 0.1).setDepth(-5);
+    if (!app.save.getData().settings.reducedMotion) {
+      this.tweens.add({ targets: leftLight, angle: -9, alpha: 0.16, duration: 1200, yoyo: true, repeat: -1 });
+      this.tweens.add({ targets: rightLight, angle: 9, alpha: 0.17, duration: 1450, yoyo: true, repeat: -1 });
+    }
     this.add.text(640, 145, 'BUG BASH ARENA', textStyle(30, '#ffc857')).setOrigin(0.5);
     this.add.text(640, 181, 'DEVELOPMENT  VS  QUALITY ASSURANCE', textStyle(15, '#d9eef7')).setOrigin(0.5);
     this.add.text(640, 213, 'Winner decides whether “works on my machine” is a valid test result.', textStyle(14, '#94b8c8')).setOrigin(0.5);
@@ -142,7 +150,8 @@ export class FightScene extends Phaser.Scene {
       const shade = x % 160 ? 0x17213b : 0x202e50;
       this.add.rectangle(x, 425, 38, 70, shade).setStrokeStyle(3, colors.navy).setDepth(-2);
       this.add.rectangle(x, 378, 34, 34, shade).setStrokeStyle(3, colors.navy).setDepth(-2);
-      this.add.rectangle(x + (x % 160 ? 20 : -20), 400, 10, 44, shade).setRotation(x % 160 ? -0.65 : 0.65).setDepth(-2);
+      const arm = this.add.rectangle(x + (x % 160 ? 20 : -20), 400, 10, 44, shade).setRotation(x % 160 ? -0.65 : 0.65).setDepth(-2);
+      if (!app.save.getData().settings.reducedMotion) this.tweens.add({ targets: arm, angle: x % 160 ? -18 : 18, duration: 360 + (x % 5) * 45, yoyo: true, repeat: -1 });
     }
   }
 
@@ -375,6 +384,7 @@ export class FightScene extends Phaser.Scene {
   private finishRound(won: boolean, reason: 'KO' | 'TIME'): void {
     if (this.ended) return;
     this.ended = true;
+    impactFlash(this, won ? colors.green : colors.orange);
     this.touchLeft = false;
     this.touchRight = false;
     this.touchBlock = false;
@@ -455,6 +465,7 @@ export class FightScene extends Phaser.Scene {
 
   private showMatchResult(won: boolean, reason: 'KO' | 'TIME'): void {
     const reward = 200 + this.developerRoundWins * 100 + this.developerHealth * 2;
+    if (won) burstParticles(this, 640, 255, [colors.yellow, colors.green, colors.cyan, colors.purple], 52, 280);
     this.add.rectangle(640, 360, 1280, 720, colors.navy, 0.72).setDepth(190).setInteractive();
     this.add.rectangle(640, 340, 790, 440, colors.navy, 0.98).setStrokeStyle(7, won ? colors.green : colors.orange).setDepth(191);
     this.add.text(640, 175, reason === 'KO' ? 'FINAL KNOCKOUT!' : 'FINAL BELL!', textStyle(25, '#39d8e8')).setOrigin(0.5).setDepth(192);

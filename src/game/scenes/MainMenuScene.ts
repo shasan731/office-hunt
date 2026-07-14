@@ -1,14 +1,17 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
+import { createAmbientMotes } from '../effects';
 import type { Difficulty } from '../types/game';
-import { addButton, addPerson, applyPixelPolish, colors, textStyle } from '../ui';
+import { addButton, addPerson, animatePerson, applyPixelPolish, colors, textStyle } from '../ui';
 import difficultyData from '../../data/difficulty.json';
 
 export class MainMenuScene extends Phaser.Scene {
   private panel?: Phaser.GameObjects.Container;
+  private hero?: Phaser.GameObjects.Container;
   constructor() { super('MainMenuScene'); }
 
   create(): void {
+    this.hero = undefined;
     this.cameras.main.setBackgroundColor('#a9edf0');
     this.add.rectangle(640, 678, 1280, 84, 0x43616c);
     for (let index = 0; index < 15; index += 1) {
@@ -26,7 +29,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.add.rectangle(920, 380, 540, 480, colors.white, 0.92).setStrokeStyle(5, colors.navy);
     this.add.text(650, 125, 'OFFICE\nHUNT', { ...textStyle(72, '#071a2b'), lineSpacing: -10 });
     this.add.text(654, 320, 'Seven levels. One salary. Many meetings.', textStyle(19, '#7c5ce7'));
-    addPerson(this, 270, 390, colors.blue).setScale(2.8);
+    this.hero = addPerson(this, 270, 390, colors.blue, 'YOU, PROBABLY').setScale(2.8);
     this.add.rectangle(275, 570, 420, 80, colors.yellow).setStrokeStyle(4, colors.navy);
     this.add.text(275, 570, 'TODAY: PAYROLL DAY!', textStyle(25, '#071a2b')).setOrigin(0.5);
     addButton(this, 920, 390, 'PLAY', () => this.startGame(), 360, colors.orange);
@@ -37,7 +40,10 @@ export class MainMenuScene extends Phaser.Scene {
     this.add.text(920, 595, `Difficulty: ${app.save.getData().settings.difficulty.toUpperCase()}`, textStyle(17, '#071a2b')).setOrigin(0.5).setName('difficulty-label');
     this.input.keyboard?.on('keydown-ENTER', () => this.startGame());
     applyPixelPolish(this);
+    createAmbientMotes(this, [colors.cyan, colors.yellow, colors.purple, colors.green], 26);
   }
+
+  update(time: number): void { if (this.hero) animatePerson(this.hero, false, time); }
 
   private startGame(): void {
     this.scene.start('NameEntryScene');
@@ -56,10 +62,10 @@ export class MainMenuScene extends Phaser.Scene {
   private showHowTo(): void {
     const panel = this.openPanel('HOW TO PLAY');
     const copy = [
-      'MOVE  Arrow keys / WASD / touch pad', 'INTERACT  E / Space / orange touch button',
+      'MOVE  Arrow keys / WASD / touch pad', 'RUN  Hold Shift (dust and dignity included)', 'INTERACT  E / Space / orange touch button',
       'PAUSE  Escape / HUD pause button', '', 'Complete seven locked levels: commute, coding run,',
       'lunch maze, QA fight, tea maze, HR hunt, and escape.', 'Lunch and tea timeouts advance with a penalty.', '',
-      'Traffic is fatal. HIDE cabinets fool headset zombies.',
+      'Traffic is fatal. HIDE cabinets fool headset zombies.', 'Explore: keys, buttons, secret rooms, NPC rescues, and shortcuts.',
     ].join('\n');
     panel.add(this.add.text(-360, -170, copy, { ...textStyle(20, '#071a2b'), lineSpacing: 10 }));
   }

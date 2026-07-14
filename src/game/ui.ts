@@ -103,6 +103,8 @@ export const addPerson = (
   const person = scene.add.container(x, y, items).setSize(54, 92);
   person.setData('walkParts', { backLeg, frontLeg, backArm, frontArm });
   person.setData('baseY', { backLeg: backLeg.y, frontLeg: frontLeg.y, backArm: backArm.y, frontArm: frontArm.y });
+  person.setData('coreParts', { torso, head, shadow, eyes, mouth });
+  person.setData('coreBase', { torsoY: torso.y, headY: head.y, shadowScale: shadow.scaleX });
   return person;
 };
 
@@ -110,13 +112,34 @@ export const animatePerson = (
   person: Phaser.GameObjects.Container,
   moving: boolean,
   time: number,
+  running = false,
 ): void => {
   const parts = person.getData('walkParts') as Record<string, Phaser.GameObjects.Rectangle> | undefined;
   const base = person.getData('baseY') as Record<string, number> | undefined;
   if (!parts || !base) return;
-  const step = moving ? Math.round(Math.sin(time / 75) * 3) : 0;
+  const core = person.getData('coreParts') as {
+    torso: Phaser.GameObjects.Rectangle;
+    head: Phaser.GameObjects.Rectangle;
+    shadow: Phaser.GameObjects.Rectangle;
+    eyes: Phaser.GameObjects.Rectangle[];
+    mouth: Phaser.GameObjects.Rectangle;
+  } | undefined;
+  const coreBase = person.getData('coreBase') as { torsoY: number; headY: number; shadowScale: number } | undefined;
+  const cadence = running ? 48 : moving ? 75 : 260;
+  const stride = running ? 6 : moving ? 3 : 1;
+  const wave = Math.sin(time / cadence);
+  const step = Math.round(wave * stride);
   parts.backLeg.y = base.backLeg + step;
   parts.frontLeg.y = base.frontLeg - step;
   parts.backArm.y = base.backArm - step;
   parts.frontArm.y = base.frontArm + step;
+  if (core && coreBase) {
+    const bob = moving ? Math.abs(Math.round(wave * (running ? 3 : 2))) : Math.round(Math.sin(time / 420));
+    core.torso.y = coreBase.torsoY - bob;
+    core.head.y = coreBase.headY - bob;
+    core.shadow.scaleX = coreBase.shadowScale + (moving ? Math.abs(wave) * 0.12 : Math.sin(time / 500) * 0.025);
+    const blink = Math.floor(time / 2300) % 2 === 1 && time % 2300 < 105;
+    core.eyes.forEach((eye) => eye.setScale(1, blink ? 0.25 : 1));
+    core.mouth.scaleX = moving && running ? 1.35 : 1;
+  }
 };

@@ -1,19 +1,21 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
 import { formatTime } from '../managers/TimeManager';
+import { addLevelIntro, createAmbientMotes, spawnDust } from '../effects';
 import { addButton, addPerson, animatePerson, applyPixelPolish, colors, textStyle } from '../ui';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected player?: Phaser.GameObjects.Container;
   protected movementLocked = false;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
-  private keys?: Record<'W' | 'A' | 'S' | 'D' | 'E', Phaser.Input.Keyboard.Key>;
+  private keys?: Record<'W' | 'A' | 'S' | 'D' | 'E' | 'SHIFT', Phaser.Input.Keyboard.Key>;
   private touch = { left: false, right: false, up: false, down: false };
   private objectiveText?: Phaser.GameObjects.Text;
   private timeText?: Phaser.GameObjects.Text;
   private scoreText?: Phaser.GameObjects.Text;
   private energyBar?: Phaser.GameObjects.Rectangle;
   private lastTick = 0;
+  private lastDust = 0;
   private dialog?: Phaser.GameObjects.Container;
 
   protected setupWorld(stageLabel: string, objective: string, startX = 90, startY = 400): void {
@@ -23,14 +25,18 @@ export abstract class BaseScene extends Phaser.Scene {
     this.touch = { left: false, right: false, up: false, down: false };
     this.dialog = undefined;
     this.lastTick = this.time.now;
+    this.lastDust = 0;
     this.cameras.main.setBackgroundColor(settings.highContrast ? '#02070c' : '#d8f5f7');
     app.state.beginStage(this.keyToStage());
     this.player = addPerson(this, startX, startY, colors.blue).setDepth(20);
     this.cursors = this.input.keyboard?.createCursorKeys();
-    this.keys = this.input.keyboard?.addKeys('W,A,S,D,E') as Record<'W' | 'A' | 'S' | 'D' | 'E', Phaser.Input.Keyboard.Key>;
+    this.keys = this.input.keyboard?.addKeys('W,A,S,D,E,SHIFT') as Record<'W' | 'A' | 'S' | 'D' | 'E' | 'SHIFT', Phaser.Input.Keyboard.Key>;
     this.drawHud(stageLabel, objective);
     this.createMobileControls();
     applyPixelPolish(this);
+    createAmbientMotes(this);
+    addLevelIntro(this, stageLabel, objective.length > 74 ? `${objective.slice(0, 71)}...` : objective);
+    this.schedulePlayerQuip();
     this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
     this.input.keyboard?.on('keydown-SPACE', () => this.interact());
     this.input.keyboard?.on('keydown-E', () => this.interact());
@@ -67,12 +73,18 @@ export abstract class BaseScene extends Phaser.Scene {
       Number(this.cursors?.right.isDown || this.keys?.D.isDown || this.touch.right) - Number(this.cursors?.left.isDown || this.keys?.A.isDown || this.touch.left),
       Number(this.cursors?.down.isDown || this.keys?.S.isDown || this.touch.down) - Number(this.cursors?.up.isDown || this.keys?.W.isDown || this.touch.up),
     ).normalize();
-    this.player.x = Phaser.Math.Clamp(this.player.x + direction.x * speed * app.difficulty.playerSpeed * delta / 1000, 24, 1256);
-    this.player.y = Phaser.Math.Clamp(this.player.y + direction.y * speed * app.difficulty.playerSpeed * delta / 1000, 105, 680);
     const moving = direction.lengthSq() > 0;
+    const running = moving && Boolean(this.keys?.SHIFT.isDown);
+    const pace = running ? 1.38 : 1;
+    this.player.x = Phaser.Math.Clamp(this.player.x + direction.x * speed * pace * app.difficulty.playerSpeed * delta / 1000, 24, 1256);
+    this.player.y = Phaser.Math.Clamp(this.player.y + direction.y * speed * pace * app.difficulty.playerSpeed * delta / 1000, 105, 680);
     if (moving && !app.save.getData().settings.reducedMotion) this.player.rotation = Math.sin(time / 80) * 0.018;
     else this.player.rotation = 0;
-    animatePerson(this.player, moving && !app.save.getData().settings.reducedMotion, time);
+    animatePerson(this.player, moving && !app.save.getData().settings.reducedMotion, time, running);
+    if (moving && time - this.lastDust > (running ? 85 : 190)) {
+      spawnDust(this, this.player.x, this.player.y, running);
+      this.lastDust = time;
+    }
     if (time - this.lastTick > 1000) { app.state.advanceTime(app.difficulty.timeScale * 0.55); this.lastTick = time; }
     this.refreshHud();
   }
@@ -109,6 +121,38 @@ export abstract class BaseScene extends Phaser.Scene {
     this.dialog.once('pointerdown', close);
     this.input.keyboard?.once('keydown-E', close);
     this.input.keyboard?.once('keydown-SPACE', close);
+  }
+
+  private schedulePlayerQuip(): void {
+    const quips: Record<string, string[]> = {
+      CommuteScene: ['Bus, boat, stairs. Remote work was somehow the unrealistic option.', 'Traffic has lanes. None of them support my deadline.'],
+      LobbyScene: ['Five flights? My fitness tracker has filed for annual leave.', 'The lift has boundaries. I respect it and deeply resent it.'],
+      WorkGauntletScene: ['Lunch is a stealth genre now. Fine. I have crouching experience.', 'If anyone asks, I am an asynchronous dependency.'],
+      LunchScene: ['Today I dine like royalty: with a plate and somewhere to sit.', 'A clean plate is basically cafeteria legendary loot.'],
+      TeaBreakScene: ['Hot water has a tighter deadline than production.', 'This tea has more dependencies than the frontend.'],
+      HRSearchScene: ['Why does HR have stealth stats?', 'I have searched three rooms and found six meetings.'],
+      EscapeScene: ['Salary acquired. Activating advanced leaving technology.', 'One more quick meeting and I become the final boss.'],
+    };
+    const sceneQuips = quips[this.scene.key];
+    if (!sceneQuips) return;
+    this.time.delayedCall(1850, () => {
+      if (!this.player || this.movementLocked || !this.scene.isActive()) return;
+      const message = Phaser.Utils.Array.GetRandom(sceneQuips);
+      const bubble = this.add.container(this.player.x, Math.max(145, this.player.y - 92), [
+        this.add.rectangle(4, 5, 390, 54, colors.navy, 0.22),
+        this.add.rectangle(0, 0, 390, 54, colors.white, 0.96).setStrokeStyle(3, colors.navy),
+        this.add.triangle(-130, 35, -12, -12, 12, -12, 0, 12, colors.white).setStrokeStyle(2, colors.navy),
+        this.add.text(0, 0, `“${message}”`, { ...textStyle(12, '#071a2b'), align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5),
+      ]).setDepth(165);
+      if (!app.save.getData().settings.reducedMotion) {
+        bubble.setScale(0.75).setAlpha(0);
+        this.tweens.add({ targets: bubble, scale: 1, alpha: 1, duration: 180, ease: 'Back.easeOut' });
+      }
+      this.time.delayedCall(2300, () => {
+        if (!bubble.active) return;
+        this.tweens.add({ targets: bubble, y: bubble.y - 22, alpha: 0, duration: 260, onComplete: () => bubble.destroy() });
+      });
+    });
   }
 
   private createMobileControls(): void {

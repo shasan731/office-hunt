@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import achievements from '../../data/achievements.json';
 import dialogues from '../../data/dialogues.json';
 import { app } from '../managers/AppContext';
+import { burstParticles, createAmbientMotes } from '../effects';
 import { calculateAchievements } from '../systems/AchievementSystem';
 import { rankForScore } from '../systems/ScoringSystem';
 import { addButton, applyPixelPolish, colors, textStyle } from '../ui';
@@ -43,5 +44,7 @@ export class ResultsScene extends Phaser.Scene {
     addButton(this, 860, 630, 'PLAY AGAIN', () => this.scene.start('NameEntryScene'), 260, colors.orange);
     addButton(this, 1135, 630, 'MAIN MENU', () => this.scene.start('MainMenuScene'), 240, colors.blue);
     applyPixelPolish(this, colors.yellow);
+    createAmbientMotes(this, [colors.yellow, colors.cyan, colors.purple, colors.green], 28);
+    burstParticles(this, 640, 100, [colors.yellow, colors.cyan, colors.purple, colors.green], 48, 290);
   }
 }

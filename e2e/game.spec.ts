@@ -148,13 +148,17 @@ test('new level scenes initialize and lunch and tea timeouts still unlock the ne
   await page.evaluate(() => window.__salaryChase?.scene.start('WorkGauntletScene'));
   await waitForScene(page, 'WorkGauntletScene');
   expect(await page.evaluate(() => {
-    const scene = window.__salaryChase?.scene.getScene('WorkGauntletScene') as unknown as { managers: unknown[]; hideSpots: unknown[] };
-    return { managers: scene.managers.length, hideSpots: scene.hideSpots.length };
-  })).toEqual({ managers: 2, hideSpots: 3 });
+    const scene = window.__salaryChase?.scene.getScene('WorkGauntletScene') as unknown as { managers: unknown[]; hideSpots: unknown[]; keycard: unknown; officeChair: unknown; meetingButton: unknown };
+    return { managers: scene.managers.length, hideSpots: scene.hideSpots.length, hasKeycardQuest: Boolean(scene.keycard), hasChairBoost: Boolean(scene.officeChair), hasManagerTrap: Boolean(scene.meetingButton) };
+  })).toEqual({ managers: 2, hideSpots: 3, hasKeycardQuest: true, hasChairBoost: true, hasManagerTrap: true });
   await page.screenshot({ path: 'test-results/level-2-gauntlet.png' });
 
   await page.evaluate(() => window.__salaryChase?.scene.start('LunchScene'));
   await waitForScene(page, 'LunchScene');
+  expect(await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('LunchScene') as unknown as { walls: unknown[]; plates: unknown[]; shortcutButton: unknown; intern: unknown; goldenSpoon: unknown };
+    return { walls: scene.walls.length, plates: scene.plates.length, shortcut: Boolean(scene.shortcutButton), rescue: Boolean(scene.intern), secret: Boolean(scene.goldenSpoon) };
+  })).toEqual({ walls: 10, plates: 4, shortcut: true, rescue: true, secret: true });
   await page.screenshot({ path: 'test-results/level-3-lunch-maze.png' });
   await page.evaluate(() => {
     const scene = window.__salaryChase?.scene.getScene('LunchScene') as unknown as { failLunch: () => void };
@@ -165,6 +169,10 @@ test('new level scenes initialize and lunch and tea timeouts still unlock the ne
 
   await page.evaluate(() => window.__salaryChase?.scene.start('TeaBreakScene'));
   await waitForScene(page, 'TeaBreakScene');
+  expect(await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('TeaBreakScene') as unknown as { walls: unknown[]; fuseButton: unknown; teaSage: unknown; trolley: unknown; secretCoffee: unknown };
+    return { walls: scene.walls.length, fuse: Boolean(scene.fuseButton), sage: Boolean(scene.teaSage), boost: Boolean(scene.trolley), secret: Boolean(scene.secretCoffee) };
+  })).toEqual({ walls: 10, fuse: true, sage: true, boost: true, secret: true });
   await page.screenshot({ path: 'test-results/level-5-tea-maze.png' });
   await page.evaluate(() => {
     const scene = window.__salaryChase?.scene.getScene('TeaBreakScene') as unknown as { failTea: () => void };
@@ -186,6 +194,10 @@ test('pixel office escape and support-zombie attack initialize safely', async ({
   await page.screenshot({ path: 'test-results/escape-pixel-qa.png' });
   expect(errors).toEqual([]);
   expect(await page.evaluate(() => window.__salaryChase?.scene.isActive('EscapeScene'))).toBe(true);
+  expect(await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('EscapeScene') as unknown as { overrideSwitch: unknown; trappedIntern: unknown };
+    return { override: Boolean(scene.overrideSwitch), rescue: Boolean(scene.trappedIntern) };
+  })).toEqual({ override: true, rescue: true });
 });
 
 test('retro Bug Bash plays three rounds and continues to tea break after the match', async ({ page }) => {

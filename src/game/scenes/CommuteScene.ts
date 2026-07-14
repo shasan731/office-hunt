@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
+import { addInteractionBeacon, burstParticles, juiceText, playPersonReaction, pulseObject } from '../effects';
 import { addPixelBuilding, addPixelStreetLight, addPixelVehicle, drawPixelRoad, type PixelVehicleType } from '../pixelArt';
-import { colors, textStyle } from '../ui';
+import { addPerson, colors, textStyle } from '../ui';
 import { BaseScene } from './BaseScene';
 
 type CommutePhase = 'home-to-bus' | 'bus-ride' | 'bus-to-boat' | 'boat-ride' | 'boat-to-office';
@@ -16,6 +17,10 @@ export class CommuteScene extends BaseScene {
   private vehicles: TrafficVehicle[] = [];
   private destination?: Phaser.GameObjects.Container;
   private dead = false;
+  private commuter?: Phaser.GameObjects.Container;
+  private commuterSpoken = false;
+  private secretToken?: Phaser.GameObjects.Container;
+  private secretCollected = false;
 
   constructor() { super('CommuteScene'); }
 
@@ -28,6 +33,7 @@ export class CommuteScene extends BaseScene {
     this.vehicles = [];
     this.destination = undefined;
     this.dead = false;
+    this.commuter = undefined; this.commuterSpoken = false; this.secretToken = undefined; this.secretCollected = false;
     this.setupWorld('LEVEL 1 / THE COMMUTE', this.objectiveForPhase(), 82, this.phase === 'bus-to-boat' ? 170 : 610);
     this.drawWeather();
     if (this.phase === 'bus-ride') this.createRide('bus');
@@ -48,7 +54,25 @@ export class CommuteScene extends BaseScene {
   }
 
   protected override interact(): void {
-    if (this.dead || this.movementLocked || !this.destination || !this.isNear(this.destination, 110)) return;
+    if (this.dead || this.movementLocked) return;
+    if (this.secretToken && !this.secretCollected && this.isNear(this.secretToken, 72)) {
+      this.secretCollected = true; this.secretToken.setVisible(false); app.state.addScore(75); app.audio.play('salary');
+      burstParticles(this, this.secretToken.x, this.secretToken.y); juiceText(this, this.secretToken.x, this.secretToken.y - 42, 'COMMUTE SECRET +75');
+      this.showDialog('Lost Transit Token', 'A genuine transit token from 1999! Worth nothing to the conductor and everything to a suspiciously specific achievement economy.');
+      return;
+    }
+    if (this.commuter && !this.commuterSpoken && this.isNear(this.commuter, 78)) {
+      this.commuterSpoken = true; playPersonReaction(this, this.commuter, 'confused');
+      const advice: Record<Weather, string> = {
+        SUNNY: 'Walk in the shade. The sun has been promoted and is micromanaging everyone.',
+        RAINY: 'My umbrella is enterprise-grade: expensive, over-engineered, and currently inside out.',
+        WINDY: 'Lean into the wind like it is constructive feedback. Ignore the flying spreadsheet.',
+        CLOUDY: 'Perfect weather for commuting: even the sky has muted notifications.',
+      };
+      this.showDialog('Veteran Commuter', advice[this.weather]);
+      return;
+    }
+    if (!this.destination || !this.isNear(this.destination, 110)) return;
     this.movementLocked = true;
     if (this.phase === 'home-to-bus') {
       this.showDialog('Bus Conductor', 'Bus caught! Air conditioning is available if every passenger agrees to imagine it.', () => this.nextPhase('bus-ride'));
@@ -89,6 +113,22 @@ export class CommuteScene extends BaseScene {
       this.destination = addPixelBuilding(this, 1190, 184, 160, 132, 'OFFICE', colors.blue).setDepth(3);
       this.add.text(1180, 282, 'FIVE FLIGHTS AWAIT', textStyle(13, '#dfffea')).setOrigin(0.5);
     }
+    const commuterPosition: Record<Exclude<CommutePhase, 'bus-ride' | 'boat-ride'>, [number, number]> = {
+      'home-to-bus': [220, 620], 'bus-to-boat': [185, 180], 'boat-to-office': [205, 620],
+    };
+    const [commuterX, commuterY] = commuterPosition[this.phase as Exclude<CommutePhase, 'bus-ride' | 'boat-ride'>];
+    this.commuter = addPerson(this, commuterX, commuterY, colors.purple, 'VETERAN COMMUTER').setScale(0.78).setDepth(8);
+    addInteractionBeacon(this, commuterX, commuterY - 76, 'TALK', colors.purple);
+    const tokenPositions: Record<Exclude<CommutePhase, 'bus-ride' | 'boat-ride'>, [number, number]> = {
+      'home-to-bus': [1015, 585], 'bus-to-boat': [1015, 210], 'boat-to-office': [1015, 585],
+    };
+    const [tokenX, tokenY] = tokenPositions[this.phase as Exclude<CommutePhase, 'bus-ride' | 'boat-ride'>];
+    this.secretToken = this.add.container(tokenX, tokenY, [
+      this.add.circle(0, 0, 16, colors.yellow).setStrokeStyle(4, colors.navy),
+      this.add.circle(0, 0, 7, colors.orange).setStrokeStyle(2, colors.white),
+      this.add.text(0, 31, 'SECRET', textStyle(9, '#ffffff')).setOrigin(0.5),
+    ]).setDepth(9);
+    pulseObject(this, this.secretToken);
     this.add.text(365, 665, 'THREE ROADS • TWO RIDES • ZERO REMOTE-WORK APPROVALS', textStyle(12, '#f7e7a8')).setOrigin(0.5);
   }
 
@@ -113,6 +153,17 @@ export class CommuteScene extends BaseScene {
       this.add.rectangle(index * 150, 330 + (index % 3) * 75, boat ? 90 : 80, boat ? 6 : 8, boat ? 0x8de7ee : colors.yellow, 0.55).setDepth(-9);
     }
     const vehicle = boat ? this.createBoat(-170, 440) : addPixelVehicle(this, -190, 455, colors.yellow, 'bus', 1).setScale(2.15);
+    const passengerLines = boat
+      ? ['Captain says the river is agile.', 'Life jacket status: backlog.', 'Next stop: five flights.']
+      : ['Window seat claimed by a bag.', 'Fare exact. Schedule fictional.', 'Standing is premium seating.'];
+    passengerLines.forEach((line, index) => {
+      const card = this.add.container(250 + index * 390, 205 + (index % 2) * 48, [
+        this.add.rectangle(4, 5, 300, 50, colors.navy, 0.22),
+        this.add.rectangle(0, 0, 300, 50, boat ? colors.cyan : colors.yellow, 0.9).setStrokeStyle(3, colors.navy),
+        this.add.text(0, 0, line, textStyle(12, '#071a2b')).setOrigin(0.5),
+      ]).setDepth(6);
+      if (!app.save.getData().settings.reducedMotion) this.tweens.add({ targets: card, y: card.y - 8, duration: 700 + index * 120, yoyo: true, repeat: -1 });
+    });
     this.add.text(640, 610, boat ? 'RIVER COMMUTE: NOW WITH 100% MORE WATER' : 'BUS STATUS: MOVING • SEATS: THEORETICAL', textStyle(17, boat ? '#dfffea' : '#ffc857')).setOrigin(0.5);
     const duration = app.save.getData().settings.reducedMotion ? 900 : 2300;
     this.tweens.add({ targets: vehicle, x: 1470, y: boat ? 425 : 455, duration, ease: 'Sine.easeInOut' });
@@ -189,6 +240,7 @@ export class CommuteScene extends BaseScene {
   private dieInTraffic(): void {
     if (this.dead) return;
     this.dead = true; this.movementLocked = true; app.audio.play('collision');
+    if (this.player) playPersonReaction(this, this.player, 'hit');
     this.player?.setDepth(60).setRotation(1.45).setAlpha(0.35);
     if (!app.save.getData().settings.reducedMotion) this.cameras.main.shake(260, 0.012);
     this.cameras.main.flash(180, 255, 122, 89);

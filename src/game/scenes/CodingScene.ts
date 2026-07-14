@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import challenges from '../../data/codingChallenges.json';
 import { app } from '../managers/AppContext';
+import { addLevelIntro, burstParticles, createAmbientMotes, impactFlash, juiceText } from '../effects';
 import { addButton, applyPixelPolish, colors, textStyle } from '../ui';
 import { WORKDAY_SCHEDULE } from '../../config/constants';
 
@@ -36,6 +37,8 @@ export class CodingScene extends Phaser.Scene {
     this.add.text(28, 50, `Minigame: ${this.mode === 'bugs' ? 'Fix the Bugs' : this.mode === 'logic' ? 'Connect the Logic' : 'Stop Production Errors'}`, textStyle(17));
     this.timerText = this.add.text(1120, 28, '00:42', textStyle(25, '#ffc857'));
     this.add.rectangle(640, 410, 1130, 540, 0x102f43).setStrokeStyle(4, colors.cyan);
+    this.add.rectangle(640, 122, 1130, 18, colors.purple, 0.6).setStrokeStyle(2, colors.cyan);
+    for (let x = 110; x <= 1170; x += 70) this.add.rectangle(x, 685, 42, 8, x % 140 ? colors.cyan : colors.purple, 0.32);
     this.add.text(115, 165, 'urgent-fix.ts  [URGENT, NATURALLY]', textStyle(18, '#ffc857'));
     this.content = this.add.container(0, 0);
     this.time.addEvent({
@@ -56,6 +59,8 @@ export class CodingScene extends Phaser.Scene {
     else if (this.mode === 'logic') this.showLogic();
     else this.startErrors();
     applyPixelPolish(this, colors.purple);
+    createAmbientMotes(this, [colors.cyan, colors.purple, colors.green], 24);
+    addLevelIntro(this, 'LEVEL 2 / CODING CRISIS', 'Three minigames. Zero sensible deadlines. Ship responsibly-ish.');
   }
 
   update(_time: number, delta: number): void {
@@ -66,6 +71,7 @@ export class CodingScene extends Phaser.Scene {
         item.setActive(false).setVisible(false);
         app.state.recordBug(false);
         app.audio.play('wrong');
+        impactFlash(this, colors.orange);
         this.showProductionQuip('Production adopted the error as a legacy feature.', colors.orange);
         this.index += 1;
         if (this.index >= this.targetCount) this.finish();
@@ -133,6 +139,8 @@ export class CodingScene extends Phaser.Scene {
       this.index += 1;
       app.state.recordBug(true);
       app.audio.play('correct');
+      burstParticles(this, item.x, item.y, [colors.green, colors.cyan, colors.white], 10, 55);
+      juiceText(this, item.x, item.y - 35, 'BUG BONKED!');
       this.showProductionQuip('Crisis clicked away. This is definitely sustainable.', colors.green);
       if (this.index >= this.targetCount) this.finish();
       else this.spawnError();
@@ -151,6 +159,8 @@ export class CodingScene extends Phaser.Scene {
     this.answerLocked = true;
     app.state.recordBug(correct);
     app.audio.play(correct ? 'correct' : 'wrong');
+    impactFlash(this, correct ? colors.green : colors.orange);
+    burstParticles(this, 640, 590, correct ? [colors.green, colors.cyan, colors.white] : [colors.orange, colors.purple], correct ? 15 : 8, 90);
     const banner = this.add.container(640, 605, [
       this.add.rectangle(0, 0, 1040, 58, correct ? colors.green : colors.orange).setStrokeStyle(3, colors.white),
       this.add.text(0, 0, `${correct ? 'FIXED' : 'WHOOPS'}: ${correct ? success : failure}`, textStyle(17)).setOrigin(0.5),
@@ -186,6 +196,7 @@ export class CodingScene extends Phaser.Scene {
     app.state.advanceTime(Math.max(8, 50 - this.seconds));
     const stability = Math.max(5, 100 - app.state.snapshot.bugsMissed * 18);
     this.content?.add(this.add.text(640, 245, 'CODE REVIEW COMPLETE', textStyle(34, '#39d8e8')).setOrigin(0.5));
+    burstParticles(this, 640, 260, [colors.cyan, colors.yellow, colors.green, colors.purple], 38, 220);
     const summary = `Bugs fixed        ${app.state.snapshot.bugsFixed}\nBugs introduced   ${app.state.snapshot.bugsMissed}\nProduction stable ${stability}%\nCoffee consumed   ${Phaser.Math.Between(2, 7)}\nTabs opened       ${Phaser.Math.Between(12, 48)}\nManager confidence ${Phaser.Math.Between(3, 96)}%`;
     this.content?.add(this.add.text(410, 310, summary, { ...textStyle(21), lineSpacing: 8 }));
     this.content?.add(addButton(this, 640, 585, 'RUN THE LUNCH GAUNTLET', () => {

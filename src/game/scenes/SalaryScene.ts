@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
+import { addLevelIntro, burstParticles, createAmbientMotes, impactFlash } from '../effects';
 import { addButton, addPerson, applyPixelPolish, colors, textStyle } from '../ui';
 import { WORKDAY_SCHEDULE } from '../../config/constants';
 import { addPixelCabinet, addPixelDesk, addPixelPlant, drawPixelFloor } from '../pixelArt';
@@ -21,6 +22,8 @@ export class SalaryScene extends Phaser.Scene {
     addPerson(this, 220, 350, colors.blue, 'YOU').setScale(1.5); addPerson(this, 1060, 350, colors.orange, 'HR').setScale(1.5);
     this.content = this.add.container(0, 0); this.showStep();
     applyPixelPolish(this, colors.green);
+    createAmbientMotes(this, [colors.green, colors.yellow, colors.cyan], 20);
+    addLevelIntro(this, 'LEVEL 6 FINALE', 'The most dangerous office mechanic: a three-question HR conversation.');
   }
   private showStep(): void {
     this.content?.removeAll(true);
@@ -38,6 +41,7 @@ export class SalaryScene extends Phaser.Scene {
   }
   private collect(): void {
     app.state.collectSalary(); app.state.unlock('salary-secured'); app.audio.play('salary'); this.content?.removeAll(true);
+    impactFlash(this, colors.yellow); burstParticles(this, 640, 350, [colors.yellow, colors.green, colors.cyan, colors.orange], 56, 260);
     const envelope = this.add.container(640, 350, [this.add.rectangle(0, 0, 250, 150, colors.yellow).setStrokeStyle(6, colors.navy), this.add.triangle(0, -5, -120, -65, 120, -65, 0, 45, colors.orange), this.add.text(0, 40, 'FICTIONAL SALARY', textStyle(18, '#071a2b')).setOrigin(0.5)]);
     if (!app.save.getData().settings.reducedMotion) this.tweens.add({ targets: envelope, scale: { from: 0.2, to: 1.25 }, angle: { from: -8, to: 0 }, duration: 650, ease: 'Back.easeOut' });
     this.content?.add(envelope); this.content?.add(this.add.text(640, 490, 'SALARY COLLECTED!  +1000', textStyle(38, '#12b886')).setOrigin(0.5));
