@@ -25,6 +25,8 @@ test.beforeEach(async ({ page }) => { await page.goto('/'); await waitForScene(p
 test('main menu loads without browser errors', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', (error) => errors.push(error.message));
   await expect(page).toHaveTitle(/Salary Chase/); await expect(page.locator('canvas')).toBeVisible();
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', 'Salary Chase');
+  await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', 'Salary Chase');
   expect(errors).toEqual([]);
 });
 

@@ -1,7 +1,6 @@
 import type { Difficulty, GameSettings, HighScoreEntry, SavedGameData } from '../types/game';
 
 export const SAVE_KEY = 'salary-chase-office-adventure';
-export const LEGACY_SAVE_KEY = 'softifybd-salary-chase';
 export const SAVE_VERSION = 1;
 
 const defaults: SavedGameData = {
@@ -44,9 +43,7 @@ export class SaveManager {
   private load(): SavedGameData {
     if (!this.storage) return structuredClone(defaults);
     try {
-      const currentRaw = this.storage.getItem(SAVE_KEY);
-      const legacyRaw = currentRaw ? null : this.storage.getItem(LEGACY_SAVE_KEY);
-      const raw = currentRaw ?? legacyRaw;
+      const raw = this.storage.getItem(SAVE_KEY);
       if (!raw) return structuredClone(defaults);
       const parsed = JSON.parse(raw) as Partial<SavedGameData>;
       if (parsed.version !== SAVE_VERSION) return structuredClone(defaults);
@@ -73,10 +70,6 @@ export class SaveManager {
           ? parsed.achievements.filter((item): item is string => typeof item === 'string')
           : [],
       };
-      if (legacyRaw) {
-        this.storage.setItem(SAVE_KEY, JSON.stringify(loaded));
-        this.storage.removeItem(LEGACY_SAVE_KEY);
-      }
       return loaded;
     } catch {
       return structuredClone(defaults);
@@ -123,7 +116,6 @@ export class SaveManager {
     this.data = structuredClone(defaults);
     try {
       this.storage?.removeItem(SAVE_KEY);
-      this.storage?.removeItem(LEGACY_SAVE_KEY);
     } catch {
       // Ignore unavailable storage.
     }
