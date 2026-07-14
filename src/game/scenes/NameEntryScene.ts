@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
-import { addPerson, colors, textStyle } from '../ui';
+import { addPerson, applyPixelPolish, colors, textStyle } from '../ui';
 
 export class NameEntryScene extends Phaser.Scene {
   constructor() { super('NameEntryScene'); }
@@ -27,6 +27,7 @@ export class NameEntryScene extends Phaser.Scene {
     });
     this.time.delayedCall(100, () => input?.focus());
     this.input.keyboard?.on('keydown-ESC', () => this.scene.start('MainMenuScene'));
+    applyPixelPolish(this, colors.blue);
   }
 
   private begin(rawName: string): void {

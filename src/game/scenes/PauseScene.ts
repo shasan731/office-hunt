@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
-import { addButton, colors, textStyle } from '../ui';
+import { addButton, applyPixelPolish, colors, textStyle } from '../ui';
 
 export class PauseScene extends Phaser.Scene {
   private pausedScene = '';
@@ -23,6 +23,7 @@ export class PauseScene extends Phaser.Scene {
     addButton(this, 640, 485, 'RESTART DAY', () => { app.state.reset(app.save.getData().settings.difficulty, app.state.snapshot.playerName); this.scene.stop(this.pausedScene); this.scene.stop(); this.scene.start('CommuteScene'); }, 340, colors.orange);
     addButton(this, 640, 555, 'MAIN MENU', () => { this.scene.stop(this.pausedScene); this.scene.stop(); this.scene.start('MainMenuScene'); }, 340, colors.navy);
     this.input.keyboard?.once('keydown-ESC', () => this.resume());
+    applyPixelPolish(this, colors.orange);
   }
   private resume(): void { this.scene.resume(this.pausedScene); this.scene.stop(); }
 }

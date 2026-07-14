@@ -148,6 +148,123 @@ export const addPixelCounter = (
   scene.add.text(0, 5, label, { ...textStyle(16), align: 'center' }).setOrigin(0.5),
 ]).setSize(width, 100).setDepth(2);
 
+export type PixelVehicleType = 'car' | 'bus' | 'rickshaw';
+
+export const drawPixelRoad = (scene: Phaser.Scene): Phaser.GameObjects.Graphics => {
+  const road = scene.add.graphics().setDepth(-20);
+  road.fillStyle(0x94d7d2).fillRect(0, 84, 1280, 70);
+  road.fillStyle(0x5c6872).fillRect(0, 154, 1280, 496);
+  road.fillStyle(0xb8c4c8).fillRect(0, 134, 1280, 22);
+  road.fillStyle(0x7d8b91).fillRect(0, 650, 1280, 32);
+  road.fillStyle(colors.navy, 0.42).fillRect(0, 154, 1280, 7);
+  road.fillStyle(colors.navy, 0.28).fillRect(0, 643, 1280, 7);
+  for (let y = 248; y <= 548; y += 100) {
+    for (let x = 18; x < 1280; x += 122) {
+      road.fillStyle(0xf7e7a8, 0.9).fillRect(x, y, 68, 8);
+      road.fillStyle(0xffffff, 0.18).fillRect(x, y, 68, 3);
+    }
+  }
+  for (let y = 168; y < 635; y += 34) {
+    road.fillStyle(0xf7f2dc, 0.92).fillRect(1080, y, 76, 18);
+    road.fillStyle(colors.navy, 0.12).fillRect(1080, y + 14, 76, 4);
+  }
+  road.fillStyle(colors.yellow).fillRect(1038, 160, 8, 480);
+  road.fillStyle(colors.navy, 0.22).fillRect(1046, 160, 4, 480);
+  return road;
+};
+
+export const addPixelBuilding = (
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  label: string,
+  color: number,
+): Phaser.GameObjects.Container => {
+  const dark = Phaser.Display.Color.ValueToColor(color).darken(28).color;
+  const light = Phaser.Display.Color.ValueToColor(color).lighten(24).color;
+  const items: Phaser.GameObjects.GameObject[] = [
+    scene.add.rectangle(8, 8, width, height, colors.navy, 0.25),
+    scene.add.rectangle(0, 0, width, height, color).setStrokeStyle(5, colors.navy),
+    scene.add.rectangle(0, -height / 2 + 10, width + 12, 20, light).setStrokeStyle(3, colors.navy),
+    scene.add.rectangle(0, height / 2 - 24, 38, 48, dark).setStrokeStyle(4, colors.navy),
+    scene.add.rectangle(11, height / 2 - 25, 5, 5, colors.yellow),
+    scene.add.text(0, -height / 2 + 35, label, { ...textStyle(13, '#071a2b'), align: 'center' }).setOrigin(0.5),
+  ];
+  for (let wx = -width / 2 + 26; wx <= width / 2 - 26; wx += 48) {
+    items.push(scene.add.rectangle(wx, 0, 25, 24, colors.cyan, 0.72).setStrokeStyle(3, colors.navy));
+    items.push(scene.add.rectangle(wx - 7, -7, 7, 6, colors.white, 0.55));
+  }
+  return scene.add.container(x, y, items).setSize(width + 16, height + 16).setDepth(-3);
+};
+
+export const addPixelStreetLight = (scene: Phaser.Scene, x: number, y: number): Phaser.GameObjects.Container =>
+  scene.add.container(x, y, [
+    scene.add.rectangle(0, 0, 8, 78, colors.navy),
+    scene.add.rectangle(15, -38, 36, 7, colors.navy),
+    scene.add.rectangle(29, -32, 20, 15, colors.yellow).setStrokeStyle(3, colors.navy),
+    scene.add.rectangle(29, -35, 12, 5, colors.white, 0.75),
+    scene.add.rectangle(0, 39, 28, 8, colors.navy),
+  ]).setDepth(-2);
+
+export const addPixelVehicle = (
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  color: number,
+  type: PixelVehicleType = 'car',
+  direction = 1,
+): Phaser.GameObjects.Container => {
+  const width = type === 'bus' ? 154 : type === 'rickshaw' ? 76 : 112;
+  const height = type === 'bus' ? 58 : type === 'rickshaw' ? 62 : 48;
+  const dark = Phaser.Display.Color.ValueToColor(color).darken(30).color;
+  const light = Phaser.Display.Color.ValueToColor(color).lighten(26).color;
+  const items: Phaser.GameObjects.GameObject[] = [
+    scene.add.rectangle(4, height / 2 + 5, width + 10, 10, 0x000000, 0.24),
+  ];
+
+  if (type === 'rickshaw') {
+    items.push(
+      scene.add.rectangle(-2, 4, 70, 42, color).setStrokeStyle(4, colors.navy),
+      scene.add.rectangle(-9, -19, 49, 22, dark).setStrokeStyle(4, colors.navy),
+      scene.add.rectangle(-9, -15, 34, 14, colors.cyan, 0.7).setStrokeStyle(2, colors.navy),
+      scene.add.rectangle(30, 10, 22, 18, light).setStrokeStyle(3, colors.navy),
+      scene.add.rectangle(-23, 29, 17, 17, colors.navy),
+      scene.add.rectangle(28, 29, 17, 17, colors.navy),
+      scene.add.rectangle(-23, 29, 7, 7, 0xb8c4c8),
+      scene.add.rectangle(28, 29, 7, 7, 0xb8c4c8),
+      scene.add.rectangle(39, 8, 7, 9, colors.yellow),
+    );
+  } else {
+    items.push(
+      scene.add.rectangle(0, 5, width, height - 14, color).setStrokeStyle(5, colors.navy),
+      scene.add.rectangle(type === 'bus' ? -24 : -12, -14, type === 'bus' ? 92 : 58, type === 'bus' ? 29 : 23, light).setStrokeStyle(4, colors.navy),
+      scene.add.rectangle(width / 2 - 10, 7, 18, 14, light).setStrokeStyle(3, colors.navy),
+      scene.add.rectangle(width / 2 + 2, 7, 7, 8, colors.yellow),
+      scene.add.rectangle(-width / 2 - 2, 9, 7, 11, colors.orange),
+      scene.add.rectangle(-width * 0.31, height / 2 - 4, 22, 18, colors.navy),
+      scene.add.rectangle(width * 0.31, height / 2 - 4, 22, 18, colors.navy),
+      scene.add.rectangle(-width * 0.31, height / 2 - 4, 9, 9, 0xb8c4c8),
+      scene.add.rectangle(width * 0.31, height / 2 - 4, 9, 9, 0xb8c4c8),
+      scene.add.rectangle(0, -height / 2 + 5, width - 18, 5, colors.white, 0.42),
+    );
+    const windowCount = type === 'bus' ? 4 : 2;
+    for (let index = 0; index < windowCount; index += 1) {
+      const windowX = type === 'bus' ? -55 + index * 31 : -24 + index * 30;
+      items.push(scene.add.rectangle(windowX, -13, type === 'bus' ? 23 : 22, 17, colors.cyan, 0.72).setStrokeStyle(2, colors.navy));
+      items.push(scene.add.rectangle(windowX - 5, -17, 7, 4, colors.white, 0.55));
+    }
+  }
+
+  const vehicle = scene.add.container(x, y, items).setSize(width, height + 16).setDepth(12);
+  vehicle.setScale(direction, 1);
+  vehicle.setData('hitWidth', width);
+  vehicle.setData('hitHeight', height);
+  vehicle.setData('vehicleType', type);
+  return vehicle;
+};
+
 export const addSupportZombie = (
   scene: Phaser.Scene,
   x: number,

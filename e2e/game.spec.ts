@@ -71,6 +71,39 @@ test('high-score screen opens and canvas fits viewport', async ({ page }) => {
   expect(box).not.toBeNull(); expect(viewport).not.toBeNull(); expect(box!.width).toBeLessThanOrEqual(viewport!.width); expect(box!.height).toBeLessThanOrEqual(viewport!.height);
 });
 
+test('pixel commute vehicles are fatal and show the late-to-office screen', async ({ page }) => {
+  test.setTimeout(60_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await startGame(page, 'Traffic QA');
+  const traffic = await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('CommuteScene') as unknown as {
+      vehicles: Array<{ object: { getData: (key: string) => unknown } }>;
+    };
+    return scene.vehicles.map((vehicle) => vehicle.object.getData('vehicleType'));
+  });
+  expect(traffic).toEqual(['car', 'bus', 'rickshaw', 'car', 'bus', 'car']);
+  await page.screenshot({ path: 'test-results/commute-pixel-qa.png' });
+  await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('CommuteScene') as unknown as {
+      player: { x: number; y: number };
+      vehicles: Array<{ object: { x: number; y: number } }>;
+    };
+    scene.player.x = scene.vehicles[0].object.x;
+    scene.player.y = scene.vehicles[0].object.y;
+  });
+  await waitForScene(page, 'GameOverScene');
+  await page.screenshot({ path: 'test-results/game-over-pixel-qa.png' });
+  const copy = await page.evaluate(() => {
+    const items = window.__salaryChase?.scene.getScene('GameOverScene').children.list as Array<{ type: string; text?: string }>;
+    return items.filter((item) => item.type === 'Text').map((item) => item.text ?? '');
+  });
+  expect(copy).toContain('YOU ARE LATE TO THE OFFICE');
+  expect(errors).toEqual([]);
+  await clickGame(page, 500, 575);
+  await waitForScene(page, 'CommuteScene');
+});
+
 test('pixel office escape and support-zombie attack initialize safely', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
 import type { Difficulty } from '../types/game';
-import { addButton, addPerson, colors, textStyle } from '../ui';
+import { addButton, addPerson, applyPixelPolish, colors, textStyle } from '../ui';
 import difficultyData from '../../data/difficulty.json';
 
 export class MainMenuScene extends Phaser.Scene {
@@ -10,7 +10,19 @@ export class MainMenuScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.setBackgroundColor('#a9edf0');
-    for (let i = 0; i < 12; i += 1) this.add.circle(i * 120 + 30, 680 - (i % 3) * 18, 75, i % 2 ? colors.cyan : colors.green, 0.18);
+    this.add.rectangle(640, 678, 1280, 84, 0x43616c);
+    for (let index = 0; index < 15; index += 1) {
+      const width = 72 + (index % 3) * 18;
+      const height = 72 + (index % 4) * 24;
+      const x = index * 92 + 32;
+      const building = this.add.rectangle(x, 638 - height / 2, width, height, index % 2 ? 0x70c7c8 : 0x82d6ce, 0.55).setStrokeStyle(3, colors.navy, 0.24);
+      building.setDepth(-2);
+      for (let row = 0; row < 3; row += 1) {
+        this.add.rectangle(x - 18, 610 - row * 24, 9, 11, colors.yellow, 0.48).setDepth(-1);
+        this.add.rectangle(x + 18, 610 - row * 24, 9, 11, colors.cyan, 0.45).setDepth(-1);
+      }
+    }
+    for (let x = 20; x < 1280; x += 120) this.add.rectangle(x, 679, 62, 6, colors.white, 0.55);
     this.add.rectangle(920, 380, 540, 480, colors.white, 0.92).setStrokeStyle(5, colors.navy);
     this.add.text(650, 125, 'SALARY\nCHASE', { ...textStyle(72, '#071a2b'), lineSpacing: -10 });
     this.add.text(654, 320, 'Code. Chase HR. Escape on time.', textStyle(20, '#7c5ce7'));
@@ -24,6 +36,7 @@ export class MainMenuScene extends Phaser.Scene {
     addButton(this, 1030, 535, 'CREDITS', () => this.showCredits(), 160, colors.navy);
     this.add.text(920, 595, `Difficulty: ${app.save.getData().settings.difficulty.toUpperCase()}`, textStyle(17, '#071a2b')).setOrigin(0.5).setName('difficulty-label');
     this.input.keyboard?.on('keydown-ENTER', () => this.startGame());
+    applyPixelPolish(this);
   }
 
   private startGame(): void {

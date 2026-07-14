@@ -13,16 +13,27 @@ export const textStyle = (size = 24, color = '#ffffff'): Phaser.Types.GameObject
   fontStyle: 'bold',
 });
 
+export const applyPixelPolish = (scene: Phaser.Scene, accent = colors.cyan): void => {
+  if (!app.save.getData().settings.reducedMotion) scene.cameras.main.fadeIn(180, 7, 26, 43);
+  scene.add.rectangle(640, 360, 1270, 710, colors.navy, 0)
+    .setStrokeStyle(6, colors.navy, 0.34)
+    .setDepth(950);
+  const corners = [[11, 11], [1269, 11], [11, 709], [1269, 709]] as const;
+  corners.forEach(([x, y]) => scene.add.rectangle(x, y, 12, 12, accent, 0.7).setDepth(951));
+};
+
 export const addButton = (
   scene: Phaser.Scene, x: number, y: number, label: string, action: () => void,
   width = 280, color = colors.blue,
 ): Phaser.GameObjects.Container => {
+  const shadow = scene.add.rectangle(6, 7, width, 54, colors.navy, 0.32);
   const bg = scene.add.rectangle(0, 0, width, 54, color).setStrokeStyle(3, colors.white, 0.9);
+  const shine = scene.add.rectangle(0, -21, width - 8, 5, Phaser.Display.Color.ValueToColor(color).lighten(32).color, 0.72);
   const text = scene.add.text(0, 0, label, textStyle(20)).setOrigin(0.5);
-  const button = scene.add.container(x, y, [bg, text]).setSize(width, 54).setInteractive({ useHandCursor: true });
+  const button = scene.add.container(x, y, [shadow, bg, shine, text]).setSize(width, 61).setInteractive({ useHandCursor: true });
   button.on('pointerover', () => button.setScale(1.04));
   button.on('pointerout', () => button.setScale(1));
-  button.on('pointerdown', () => { app.audio.play('click'); action(); });
+  button.on('pointerdown', () => { button.setScale(0.98); app.audio.play('click'); action(); });
   return button;
 };
 

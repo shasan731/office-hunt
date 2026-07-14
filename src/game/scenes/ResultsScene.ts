@@ -4,7 +4,7 @@ import dialogues from '../../data/dialogues.json';
 import { app } from '../managers/AppContext';
 import { calculateAchievements } from '../systems/AchievementSystem';
 import { rankForScore } from '../systems/ScoringSystem';
-import { addButton, colors, textStyle } from '../ui';
+import { addButton, applyPixelPolish, colors, textStyle } from '../ui';
 
 export class ResultsScene extends Phaser.Scene {
   constructor() { super('ResultsScene'); }
@@ -42,5 +42,6 @@ export class ResultsScene extends Phaser.Scene {
     this.add.text(950, 485, Phaser.Utils.Array.GetRandom(dialogues.results), { ...textStyle(17, '#39d8e8'), align: 'center', wordWrap: { width: 380 } }).setOrigin(0.5);
     addButton(this, 860, 630, 'PLAY AGAIN', () => this.scene.start('NameEntryScene'), 260, colors.orange);
     addButton(this, 1135, 630, 'MAIN MENU', () => this.scene.start('MainMenuScene'), 240, colors.blue);
+    applyPixelPolish(this, colors.yellow);
   }
 }

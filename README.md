@@ -2,6 +2,8 @@
 
 A lightweight, colorful Phaser 3 office adventure. Commute through absurd traffic, mark attendance, repair urgent code, follow clues to a mobile HR employee, collect a fictional salary, and dodge “one small change” on the way out.
 
+The commute is a 32-bit-inspired city crossing with pixel cars, buses, rickshaws, buildings, sidewalks, and a safer marked crossing. Vehicle collisions are fatal to the run and open a **You are late to the office** retry screen.
+
 The complete game runs in the browser as a static Vite app—no backend, accounts, tracking, remote gameplay assets, or environment variables.
 
 ## Game stages

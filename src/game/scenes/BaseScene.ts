@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
 import { formatTime } from '../managers/TimeManager';
-import { addButton, addPerson, animatePerson, colors, textStyle } from '../ui';
+import { addButton, addPerson, animatePerson, applyPixelPolish, colors, textStyle } from '../ui';
 
 export abstract class BaseScene extends Phaser.Scene {
   protected player?: Phaser.GameObjects.Container;
@@ -30,6 +30,7 @@ export abstract class BaseScene extends Phaser.Scene {
     this.keys = this.input.keyboard?.addKeys('W,A,S,D,E') as Record<'W' | 'A' | 'S' | 'D' | 'E', Phaser.Input.Keyboard.Key>;
     this.drawHud(stageLabel, objective);
     this.createMobileControls();
+    applyPixelPolish(this);
     this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
     this.input.keyboard?.on('keydown-SPACE', () => this.interact());
     this.input.keyboard?.on('keydown-E', () => this.interact());
@@ -44,15 +45,18 @@ export abstract class BaseScene extends Phaser.Scene {
   }
 
   private drawHud(stageLabel: string, objective: string): void {
-    this.add.rectangle(640, 42, 1280, 84, colors.navy, 0.96).setDepth(100);
-    this.add.text(24, 14, stageLabel.toUpperCase(), textStyle(18, '#39d8e8')).setDepth(101);
-    this.objectiveText = this.add.text(24, 43, objective, textStyle(17)).setDepth(101);
-    this.timeText = this.add.text(1020, 17, formatTime(app.state.snapshot.minutes), textStyle(20, '#ffc857')).setDepth(101);
-    this.scoreText = this.add.text(1020, 48, `Score ${app.state.snapshot.score}`, textStyle(17)).setDepth(101);
-    this.add.rectangle(820, 27, 160, 16, 0x34495e).setOrigin(0).setDepth(101);
-    this.energyBar = this.add.rectangle(820, 27, 160, 16, colors.green).setOrigin(0).setDepth(102);
-    this.add.text(820, 49, 'ENERGY', textStyle(13, '#ffffff')).setDepth(101);
-    addButton(this, 1243, 43, 'Ⅱ', () => this.togglePause(), 48, colors.purple).setDepth(103);
+    this.add.rectangle(640, 45, 1280, 90, colors.navy, 0.98).setDepth(100);
+    this.add.rectangle(640, 88, 1280, 5, colors.cyan, 0.86).setDepth(101);
+    this.add.rectangle(103, 25, 176, 32, colors.blue, 0.72).setStrokeStyle(2, colors.cyan).setDepth(101);
+    this.add.text(18, 14, stageLabel.toUpperCase(), textStyle(16, '#dffbff')).setDepth(102);
+    this.objectiveText = this.add.text(20, 49, objective, { ...textStyle(16), wordWrap: { width: 720 } }).setDepth(102);
+    this.timeText = this.add.text(1034, 14, formatTime(app.state.snapshot.minutes), textStyle(19, '#ffc857')).setDepth(102);
+    this.scoreText = this.add.text(1034, 49, `SCORE ${app.state.snapshot.score}`, textStyle(15, '#d9eef7')).setDepth(102);
+    this.add.text(790, 12, app.state.snapshot.playerName.toUpperCase(), textStyle(11, '#94b8c8')).setDepth(102);
+    this.add.rectangle(874, 42, 176, 20, 0x243948).setStrokeStyle(3, colors.white, 0.55).setDepth(101);
+    this.energyBar = this.add.rectangle(788, 42, 172, 14, colors.green).setOrigin(0, 0.5).setDepth(102);
+    this.add.text(790, 57, 'ENERGY', textStyle(11, '#ffffff')).setDepth(102);
+    addButton(this, 1243, 43, 'II', () => this.togglePause(), 48, colors.purple).setDepth(103);
   }
 
   protected updateObjective(text: string): void { this.objectiveText?.setText(text); }
@@ -76,7 +80,8 @@ export abstract class BaseScene extends Phaser.Scene {
   protected refreshHud(): void {
     this.timeText?.setText(formatTime(app.state.snapshot.minutes));
     this.scoreText?.setText(`Score ${app.state.snapshot.score}`);
-    this.energyBar?.setDisplaySize(160 * app.state.snapshot.energy / 100, 16);
+    const energy = app.state.snapshot.energy;
+    this.energyBar?.setDisplaySize(172 * energy / 100, 14).setFillStyle(energy > 55 ? colors.green : energy > 25 ? colors.yellow : colors.orange);
   }
 
   protected isNear(object: Phaser.GameObjects.Components.Transform, distance = 75): boolean {
@@ -86,11 +91,20 @@ export abstract class BaseScene extends Phaser.Scene {
   protected showDialog(speaker: string, message: string, onClose?: () => void): void {
     this.dialog?.destroy();
     this.movementLocked = true;
+    const shadow = this.add.rectangle(9, 10, 1080, 150, 0x000000, 0.3);
     const bg = this.add.rectangle(0, 0, 1080, 150, colors.navy, 0.98).setStrokeStyle(4, colors.cyan);
+    const stripe = this.add.rectangle(0, -70, 1070, 8, colors.cyan, 0.85);
+    const speakerPixel = this.add.rectangle(-488, -42, 34, 34, colors.purple).setStrokeStyle(3, colors.white);
+    const initial = this.add.text(-488, -42, speaker.trim().charAt(0).toUpperCase(), textStyle(17)).setOrigin(0.5);
     const title = this.add.text(-510, -56, speaker, textStyle(20, '#ffc857'));
-    const body = this.add.text(-510, -20, message, { ...textStyle(21), wordWrap: { width: 900 } });
+    title.setPosition(-458, -58);
+    const body = this.add.text(-458, -22, message, { ...textStyle(20), wordWrap: { width: 850 } });
     const hint = this.add.text(510, 55, 'E / SPACE / TAP  ›', textStyle(14, '#39d8e8')).setOrigin(1);
-    this.dialog = this.add.container(640, 615, [bg, title, body, hint]).setDepth(300).setSize(1080, 150).setInteractive();
+    this.dialog = this.add.container(640, 615, [shadow, bg, stripe, speakerPixel, initial, title, body, hint]).setDepth(300).setSize(1080, 150).setInteractive();
+    if (!app.save.getData().settings.reducedMotion) {
+      this.dialog.setY(690);
+      this.tweens.add({ targets: this.dialog, y: 615, duration: 170, ease: 'Quad.easeOut' });
+    }
     const close = (): void => { this.dialog?.destroy(); this.dialog = undefined; this.movementLocked = false; onClose?.(); };
     this.dialog.once('pointerdown', close);
     this.input.keyboard?.once('keydown-E', close);

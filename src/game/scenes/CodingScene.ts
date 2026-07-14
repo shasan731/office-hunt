@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import challenges from '../../data/codingChallenges.json';
 import { app } from '../managers/AppContext';
-import { addButton, colors, textStyle } from '../ui';
+import { addButton, applyPixelPolish, colors, textStyle } from '../ui';
 import { WORKDAY_SCHEDULE } from '../../config/constants';
 
 type Mode = 'bugs' | 'logic' | 'errors';
@@ -55,6 +55,7 @@ export class CodingScene extends Phaser.Scene {
     if (this.mode === 'bugs') this.showBug();
     else if (this.mode === 'logic') this.showLogic();
     else this.startErrors();
+    applyPixelPolish(this, colors.purple);
   }
 
   update(_time: number, delta: number): void {

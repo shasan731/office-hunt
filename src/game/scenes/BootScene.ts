@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { colors, textStyle } from '../ui';
+import { applyPixelPolish, colors, textStyle } from '../ui';
 
 export class BootScene extends Phaser.Scene {
   constructor() { super('BootScene'); }
@@ -13,5 +13,6 @@ export class BootScene extends Phaser.Scene {
     this.tweens.add({ targets: bar, displayWidth: 500, duration: 900, ease: 'Sine.easeInOut' });
     this.time.delayedCall(450, () => message.setText(Phaser.Utils.Array.GetRandom(messages)));
     this.time.delayedCall(1000, () => this.scene.start('MainMenuScene'));
+    applyPixelPolish(this);
   }
 }
