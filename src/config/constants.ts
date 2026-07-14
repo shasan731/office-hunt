@@ -1,6 +1,7 @@
 export const WORKDAY_SCHEDULE = {
   commuteStart: 9 * 60 + 45,
   officeStart: 10 * 60,
+  lunchRunStart: 13 * 60 + 45,
   lunchStart: 14 * 60,
   lunchEnd: 15 * 60,
   fightStart: 15 * 60 + 15,

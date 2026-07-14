@@ -106,6 +106,75 @@ test('pixel commute vehicles are fatal and show the late-to-office screen', asyn
   await waitForScene(page, 'CommuteScene');
 });
 
+test('Level 1 requires five stair flights and attendance before coding unlocks', async ({ page }) => {
+  test.setTimeout(60_000);
+  await startGame(page, 'Level Gate QA');
+  await page.evaluate(() => window.__salaryChase?.scene.start('LobbyScene'));
+  await waitForScene(page, 'LobbyScene');
+  for (let flight = 0; flight < 5; flight += 1) {
+    await page.evaluate(() => {
+      const scene = window.__salaryChase?.scene.getScene('LobbyScene') as unknown as {
+        flight: number;
+        player: { x: number; y: number };
+        stairs: Array<{ x: number; y: number }>;
+        interact: () => void;
+      };
+      const stair = scene.stairs[scene.flight];
+      scene.player.x = stair.x; scene.player.y = stair.y; scene.interact();
+    });
+    await page.keyboard.press('e');
+  }
+  expect(await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('LobbyScene') as unknown as { flight: number };
+    return scene.flight;
+  })).toBe(5);
+  await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('LobbyScene') as unknown as {
+      player: { x: number; y: number };
+      device: { x: number; y: number };
+      interact: () => void;
+    };
+    scene.player.x = scene.device.x; scene.player.y = scene.device.y; scene.interact();
+  });
+  await page.keyboard.press('e');
+  await waitForScene(page, 'CodingScene');
+});
+
+test('new level scenes initialize and lunch and tea timeouts still unlock the next level', async ({ page }) => {
+  test.setTimeout(90_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await startGame(page, 'Maze QA');
+  await page.evaluate(() => window.__salaryChase?.scene.start('WorkGauntletScene'));
+  await waitForScene(page, 'WorkGauntletScene');
+  expect(await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('WorkGauntletScene') as unknown as { managers: unknown[]; hideSpots: unknown[] };
+    return { managers: scene.managers.length, hideSpots: scene.hideSpots.length };
+  })).toEqual({ managers: 2, hideSpots: 3 });
+  await page.screenshot({ path: 'test-results/level-2-gauntlet.png' });
+
+  await page.evaluate(() => window.__salaryChase?.scene.start('LunchScene'));
+  await waitForScene(page, 'LunchScene');
+  await page.screenshot({ path: 'test-results/level-3-lunch-maze.png' });
+  await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('LunchScene') as unknown as { failLunch: () => void };
+    scene.failLunch();
+  });
+  await page.keyboard.press('e');
+  await waitForScene(page, 'FightScene');
+
+  await page.evaluate(() => window.__salaryChase?.scene.start('TeaBreakScene'));
+  await waitForScene(page, 'TeaBreakScene');
+  await page.screenshot({ path: 'test-results/level-5-tea-maze.png' });
+  await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('TeaBreakScene') as unknown as { failTea: () => void };
+    scene.failTea();
+  });
+  await page.keyboard.press('e');
+  await waitForScene(page, 'HRSearchScene');
+  expect(errors).toEqual([]);
+});
+
 test('pixel office escape and support-zombie attack initialize safely', async ({ page }) => {
   test.setTimeout(60_000);
   const errors: string[] = [];

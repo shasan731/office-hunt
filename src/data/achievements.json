@@ -6,7 +6,7 @@
   { "id": "salary-secured", "name": "Salary Secured", "description": "Collect salary." },
   { "id": "six-clock-ninja", "name": "Seven O'Clock Ninja", "description": "Leave between 7:00 and 7:02." },
   { "id": "meeting-dodger", "name": "Meeting Dodger", "description": "Avoid every surprise meeting." },
-  { "id": "tea-powered", "name": "Tea Powered", "description": "Use tea three times and finish the day." },
+  { "id": "tea-powered", "name": "Tea Powered", "description": "Brew tea before the hot-water timer expires." },
   { "id": "corporate-survivor", "name": "Corporate Survivor", "description": "Complete Corporate difficulty." },
   { "id": "works-machine", "name": "Works on My Machine", "description": "Finish despite multiple production errors." }
 ]

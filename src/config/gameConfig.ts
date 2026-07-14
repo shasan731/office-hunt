@@ -14,6 +14,7 @@ import { PauseScene } from '../game/scenes/PauseScene';
 import { ResultsScene } from '../game/scenes/ResultsScene';
 import { SalaryScene } from '../game/scenes/SalaryScene';
 import { TeaBreakScene } from '../game/scenes/TeaBreakScene';
+import { WorkGauntletScene } from '../game/scenes/WorkGauntletScene';
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -25,5 +26,5 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   input: { activePointers: 3 },
   dom: { createContainer: true },
-  scene: [BootScene, MainMenuScene, NameEntryScene, CommuteScene, GameOverScene, LobbyScene, CodingScene, LunchScene, FightScene, TeaBreakScene, HRSearchScene, SalaryScene, EscapeScene, ResultsScene, PauseScene],
+  scene: [BootScene, MainMenuScene, NameEntryScene, CommuteScene, GameOverScene, LobbyScene, CodingScene, WorkGauntletScene, LunchScene, FightScene, TeaBreakScene, HRSearchScene, SalaryScene, EscapeScene, ResultsScene, PauseScene],
 };

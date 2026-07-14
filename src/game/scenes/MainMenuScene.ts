@@ -25,7 +25,7 @@ export class MainMenuScene extends Phaser.Scene {
     for (let x = 20; x < 1280; x += 120) this.add.rectangle(x, 679, 62, 6, colors.white, 0.55);
     this.add.rectangle(920, 380, 540, 480, colors.white, 0.92).setStrokeStyle(5, colors.navy);
     this.add.text(650, 125, 'SALARY\nCHASE', { ...textStyle(72, '#071a2b'), lineSpacing: -10 });
-    this.add.text(654, 320, 'Code. Chase HR. Escape on time.', textStyle(20, '#7c5ce7'));
+    this.add.text(654, 320, 'Seven levels. One salary. Many meetings.', textStyle(19, '#7c5ce7'));
     addPerson(this, 270, 390, colors.blue).setScale(2.8);
     this.add.rectangle(275, 570, 420, 80, colors.yellow).setStrokeStyle(4, colors.navy);
     this.add.text(275, 570, 'TODAY: PAYROLL DAY!', textStyle(25, '#071a2b')).setOrigin(0.5);
@@ -57,9 +57,9 @@ export class MainMenuScene extends Phaser.Scene {
     const panel = this.openPanel('HOW TO PLAY');
     const copy = [
       'MOVE  Arrow keys / WASD / touch pad', 'INTERACT  E / Space / orange touch button',
-      'PAUSE  Escape / HUD pause button', '', 'Reach the office, mark attendance, fix urgent code,',
-      'survive lunch and tea, locate HR, collect salary, and', 'escape between 7:00 and 7:10 PM for the best score.', '',
-      'Collisions waste time, not limbs. Tea restores energy.',
+      'PAUSE  Escape / HUD pause button', '', 'Complete seven locked levels: commute, coding run,',
+      'lunch maze, QA fight, tea maze, HR hunt, and escape.', 'Lunch and tea timeouts advance with a penalty.', '',
+      'Traffic is fatal. HIDE cabinets fool headset zombies.',
     ].join('\n');
     panel.add(this.add.text(-360, -170, copy, { ...textStyle(20, '#071a2b'), lineSpacing: 10 }));
   }

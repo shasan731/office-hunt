@@ -1,28 +1,24 @@
 # Salary Chase
 
-A lightweight, colorful Phaser 3 office adventure. Commute through absurd traffic, mark attendance, repair urgent code, battle a Software Tester, follow clues to a mobile HR employee, collect a fictional salary, and dodge “one small change” on the way out.
+A colorful seven-level Phaser 3 office adventure. Commute by bus and boat, beat five flights of stairs, repair absurd code, survive office hazards, battle QA, hunt HR, collect a fictional salary, and escape before another meeting begins.
 
-The commute is a 32-bit-inspired city crossing with pixel cars, buses, rickshaws, buildings, sidewalks, and a safer marked crossing. Vehicle collisions are fatal to the run and open a **You are late to the office** retry screen.
+The game uses an original 64-bit-retro visual style: richly layered programmatic sprites, colorful beveled environments, scanline polish, expressive characters, and no remote art assets. Level 1 randomly selects sunny, rainy, windy, or cloudy weather for the entire trip. Vehicle collisions remain fatal to the run and open a **You are late to the office** retry screen.
 
 The complete game runs in the browser as a static Vite app—no backend, accounts, tracking, remote gameplay assets, or environment variables.
 
-## Game stages
+## Seven levels
 
-1. Employee name entry
-2. Morning Commute
-3. Office Arrival
-4. Random coding minigame: Fix the Bugs, Connect the Logic, or Stop Production Errors
-5. Lunch Break food-scavenger adventure
-6. Three-round retro Bug Bash: Developer vs Software Tester
-7. Tea Break mug-and-token quest
-8. Find HR across a complete office map
-9. Salary conversation
-10. Escape the Office
-11. Results, rank, achievements, and persistent high scores
+1. **The Commute** — Leave home, cross traffic to catch a bus, cross again for a boat, cross once more to the office, climb five stair flights, and mark attendance.
+2. **Coding and the Lunch Gauntlet** — Complete a random coding minigame, then hide from support zombies and angry managers. Getting caught launches a funny bug ticket or micro-meeting.
+3. **Lunch Maze** — Find the clean plate and an empty seat before the cafeteria timer expires. Timing out gives an HR warning but still unlocks Level 4.
+4. **QA Bug Bash** — Play all three Developer-vs-Software-Tester rounds and win at least two.
+5. **Hot Tea Maze** — Find hot water, a tea bag, and sugar in order. Timing out unlocks Level 6 without tea or its energy bonus.
+6. **Hunt HR** — Search the full office, gather funny clues, avoid support zombies, catch moving HR, and survive the salary questionnaire.
+7. **Final Escape** — Leave on time while hiding from support zombies and navigating around roaming managers.
 
-Office interiors and furniture use original programmatic 32-bit-inspired pixel art. During the HR hunt and escape, headset-wearing customer-support zombies may attack with urgent tickets. Hide near the server rack or filing cabinets marked **HIDE**, or keep moving until they lose interest.
+Each level locks the next until its completion condition is met. A timeout counts as completion only in the lunch and tea mazes, exactly as described above.
 
-The Bug Bash plays all three rounds. Health and the 60-second timer reset for each round, and the developer must win at least two rounds before tea break unlocks.
+During Levels 2, 6, and 7, headset-wearing customer-support zombies may attack with urgent tickets. Hide near cabinets or server racks marked **HIDE**, or keep moving until they lose interest.
 
 ## Workday schedule
 

@@ -17,7 +17,7 @@ export class SalaryScene extends Phaser.Scene {
     addPixelCabinet(this, 135, 500, 'PAYROLL');
     addPixelDesk(this, 1035, 520, 150, 'HR DESK');
     addPixelPlant(this, 1140, 215);
-    this.add.text(640, 120, '8 / THE SALARY CONVERSATION', textStyle(30, '#071a2b')).setOrigin(0.5);
+    this.add.text(640, 120, 'LEVEL 6 FINALE / THE SALARY CONVERSATION', textStyle(28, '#071a2b')).setOrigin(0.5);
     addPerson(this, 220, 350, colors.blue, 'YOU').setScale(1.5); addPerson(this, 1060, 350, colors.orange, 'HR').setScale(1.5);
     this.content = this.add.container(0, 0); this.showStep();
     applyPixelPolish(this, colors.green);
@@ -41,6 +41,6 @@ export class SalaryScene extends Phaser.Scene {
     const envelope = this.add.container(640, 350, [this.add.rectangle(0, 0, 250, 150, colors.yellow).setStrokeStyle(6, colors.navy), this.add.triangle(0, -5, -120, -65, 120, -65, 0, 45, colors.orange), this.add.text(0, 40, 'FICTIONAL SALARY', textStyle(18, '#071a2b')).setOrigin(0.5)]);
     if (!app.save.getData().settings.reducedMotion) this.tweens.add({ targets: envelope, scale: { from: 0.2, to: 1.25 }, angle: { from: -8, to: 0 }, duration: 650, ease: 'Back.easeOut' });
     this.content?.add(envelope); this.content?.add(this.add.text(640, 490, 'SALARY COLLECTED!  +1000', textStyle(38, '#12b886')).setOrigin(0.5));
-    this.content?.add(addButton(this, 640, 590, 'BEGIN THE ESCAPE', () => { if (app.state.snapshot.minutes < WORKDAY_SCHEDULE.officeEnd - 6) app.state.setTime(WORKDAY_SCHEDULE.officeEnd - 6); this.scene.start('EscapeScene'); }, 380, colors.orange));
+    this.content?.add(addButton(this, 640, 590, 'UNLOCK LEVEL 7: ESCAPE', () => { if (app.state.snapshot.minutes < WORKDAY_SCHEDULE.officeEnd - 6) app.state.setTime(WORKDAY_SCHEDULE.officeEnd - 6); this.scene.start('EscapeScene'); }, 420, colors.orange));
   }
 }

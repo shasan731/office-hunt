@@ -13,6 +13,10 @@ export const drawPixelFloor = (
     for (let x = 50; x < 1230; x += tile) {
       graphics.fillStyle(((x / tile + y / tile) % 2 === 0) ? light : dark);
       graphics.fillRect(x, y, tile - 2, tile - 2);
+      graphics.fillStyle(0xffffff, 0.1);
+      graphics.fillRect(x + 3, y + 3, tile - 10, 3);
+      graphics.fillStyle(colors.navy, 0.07);
+      graphics.fillRect(x + tile - 6, y + 6, 3, tile - 11);
     }
   }
   return graphics;

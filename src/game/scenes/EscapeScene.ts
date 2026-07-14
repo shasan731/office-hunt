@@ -32,7 +32,7 @@ export class EscapeScene extends BaseScene {
     this.supportAttacks = undefined;
     this.hidden = false;
     this.collisionCooldown = false;
-    this.setupWorld('9 / Escape', 'Reach EXIT. Use cabinets marked HIDE when support zombies attack.', 110, 610);
+    this.setupWorld('LEVEL 7 / FINAL ESCAPE', 'Get out on time. Hide from support zombies and dodge roaming managers.', 110, 610);
     drawPixelFloor(this, 0xe8e2f2, 0xd8d0e7);
     for (let x = 260; x < 1100; x += 270) {
       addPixelDesk(this, x, 245, 155);
@@ -54,7 +54,7 @@ export class EscapeScene extends BaseScene {
         index === 0 ? colors.orange : colors.purple,
         label,
       ).setDepth(10);
-      this.traps.push({ person, label, manager: index === 0, active: true, direction: index % 2 ? -1 : 1 });
+      this.traps.push({ person, label, manager: index === 0 || index === 3, active: true, direction: index % 2 ? -1 : 1 });
     });
     this.add.text(620, 340, '7:00 PM\nTHE MOST DANGEROUS TEN MINUTES', { ...textStyle(23, '#071a2b'), align: 'center' }).setOrigin(0.5);
     this.add.text(620, 395, 'HEADSETS DETECTED — BREAK LINE OF SIGHT AT A HIDE CABINET', textStyle(14, '#7c5ce7')).setOrigin(0.5);

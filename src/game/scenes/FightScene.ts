@@ -148,7 +148,7 @@ export class FightScene extends Phaser.Scene {
 
   private drawFightHud(): void {
     this.add.rectangle(640, 45, 1280, 90, colors.navy, 0.98).setDepth(100);
-    this.add.text(24, 12, '5 / BUG BASH', textStyle(17, '#39d8e8')).setDepth(102);
+    this.add.text(24, 12, 'LEVEL 4 / QA BUG BASH', textStyle(17, '#39d8e8')).setDepth(102);
     this.add.text(24, 71, 'A/D move  •  J/Space punch  •  K kick  •  S/Down block', textStyle(13, '#d9eef7')).setDepth(102);
     this.add.rectangle(352, 31, 386, 24, 0x311b2d).setStrokeStyle(3, colors.white).setDepth(101);
     this.developerBar = this.add.rectangle(161, 31, 382, 18, colors.green).setOrigin(0, 0.5).setDepth(102);

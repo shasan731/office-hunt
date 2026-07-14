@@ -31,7 +31,7 @@ export class HRSearchScene extends BaseScene {
     this.clueArrow = undefined;
     this.supportAttacks = undefined;
     this.hrRoute = 0;
-    this.setupWorld('7 / Find HR', 'Ask for clues. Hide near the server rack if support zombies attack.', 120, 610);
+    this.setupWorld('LEVEL 6 / HUNT HR', 'Solve the office clue hunt, dodge support zombies, and catch the moving HR target.', 120, 610);
     this.drawOffice(); this.createNpcs();
     this.supportAttacks = new SupportAttackSystem(this, {
       getPlayer: () => this.player,
@@ -60,7 +60,7 @@ export class HRSearchScene extends BaseScene {
     if (near.id === 'hr') {
       if (app.state.snapshot.clues <= 3) app.state.unlock('hr-detective');
       app.state.addScore(app.state.snapshot.clues <= 3 ? 400 : 0);
-      this.showDialog('HR', 'You found me! Is this about the highly anticipated monthly notification?', () => this.scene.start('SalaryScene'));
+      this.showDialog('HR', 'You found me! Level 6 final challenge: survive the highly scientific salary questionnaire.', () => this.scene.start('SalaryScene'));
       return;
     }
     if (!app.state.addClue(near.id)) {

@@ -11,7 +11,7 @@ export const calculateAchievements = (state: Readonly<GameState>): string[] => {
   const exit = parseArrival(state.exitTime);
   if (exit >= WORKDAY_SCHEDULE.officeEnd && exit <= WORKDAY_SCHEDULE.officeEnd + 2) unlocked.push('six-clock-ninja');
   if (state.meetingsHit === 0) unlocked.push('meeting-dodger');
-  if (state.teaBreaks >= 3 && state.exitTime !== '--') unlocked.push('tea-powered');
+  if (state.teaQuestCompleted && state.exitTime !== '--') unlocked.push('tea-powered');
   if (state.difficulty === 'corporate' && state.exitTime !== '--') unlocked.push('corporate-survivor');
   if (state.bugsMissed >= 2 && state.exitTime !== '--') unlocked.push('works-machine');
   return unlocked;

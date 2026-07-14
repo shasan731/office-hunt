@@ -32,7 +32,7 @@ export class CodingScene extends Phaser.Scene {
     this.targetCount = app.difficulty.codingCount;
     this.cameras.main.setBackgroundColor('#071a2b');
     this.add.rectangle(640, 44, 1280, 88, 0x0d2638);
-    this.add.text(28, 17, '3 / CODING CRISIS', textStyle(21, '#39d8e8'));
+    this.add.text(28, 17, 'LEVEL 2 / CODING CRISIS', textStyle(21, '#39d8e8'));
     this.add.text(28, 50, `Minigame: ${this.mode === 'bugs' ? 'Fix the Bugs' : this.mode === 'logic' ? 'Connect the Logic' : 'Stop Production Errors'}`, textStyle(17));
     this.timerText = this.add.text(1120, 28, '00:42', textStyle(25, '#ffc857'));
     this.add.rectangle(640, 410, 1130, 540, 0x102f43).setStrokeStyle(4, colors.cyan);
@@ -188,9 +188,9 @@ export class CodingScene extends Phaser.Scene {
     this.content?.add(this.add.text(640, 245, 'CODE REVIEW COMPLETE', textStyle(34, '#39d8e8')).setOrigin(0.5));
     const summary = `Bugs fixed        ${app.state.snapshot.bugsFixed}\nBugs introduced   ${app.state.snapshot.bugsMissed}\nProduction stable ${stability}%\nCoffee consumed   ${Phaser.Math.Between(2, 7)}\nTabs opened       ${Phaser.Math.Between(12, 48)}\nManager confidence ${Phaser.Math.Between(3, 96)}%`;
     this.content?.add(this.add.text(410, 310, summary, { ...textStyle(21), lineSpacing: 8 }));
-    this.content?.add(addButton(this, 640, 585, 'CLOCK OUT FOR LUNCH', () => {
-      app.state.setTime(WORKDAY_SCHEDULE.lunchStart);
-      this.scene.start('LunchScene');
+    this.content?.add(addButton(this, 640, 585, 'RUN THE LUNCH GAUNTLET', () => {
+      app.state.setTime(WORKDAY_SCHEDULE.lunchRunStart);
+      this.scene.start('WorkGauntletScene');
     }, 380, colors.orange));
   }
 }

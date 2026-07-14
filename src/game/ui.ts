@@ -15,9 +15,16 @@ export const textStyle = (size = 24, color = '#ffffff'): Phaser.Types.GameObject
 
 export const applyPixelPolish = (scene: Phaser.Scene, accent = colors.cyan): void => {
   if (!app.save.getData().settings.reducedMotion) scene.cameras.main.fadeIn(180, 7, 26, 43);
+  // Layered color, bevels, and restrained scanlines evoke a bright 64-bit-era game UI.
+  scene.add.rectangle(52, 360, 82, 620, accent, 0.025).setDepth(938);
+  scene.add.rectangle(1228, 360, 82, 620, colors.purple, 0.025).setDepth(938);
+  for (let y = 94; y < 714; y += 12) scene.add.rectangle(640, y, 1268, 2, colors.navy, 0.018).setDepth(940);
   scene.add.rectangle(640, 360, 1270, 710, colors.navy, 0)
     .setStrokeStyle(6, colors.navy, 0.34)
     .setDepth(950);
+  scene.add.rectangle(640, 360, 1254, 694, colors.navy, 0)
+    .setStrokeStyle(2, accent, 0.16)
+    .setDepth(949);
   const corners = [[11, 11], [1269, 11], [11, 709], [1269, 709]] as const;
   corners.forEach(([x, y]) => scene.add.rectangle(x, y, 12, 12, accent, 0.7).setDepth(951));
 };
@@ -48,7 +55,7 @@ export const addPerson = (
   const hair = hairColors[(seed >> 2) % hairColors.length];
   const darkShirt = Phaser.Display.Color.ValueToColor(shirt).darken(25).color;
 
-  // Chunky 4–8 px shapes create a crisp 32-bit-era silhouette without image assets.
+  // Layered 3–8 px shapes, highlights, and role props create a colorful 64-bit-retro silhouette.
   const shadow = scene.add.rectangle(0, 29, 42, 8, 0x000000, 0.18);
   const backLeg = scene.add.rectangle(-8, 21, 10, 20, darkShirt).setStrokeStyle(3, colors.navy);
   const frontLeg = scene.add.rectangle(8, 21, 10, 20, darkShirt).setStrokeStyle(3, colors.navy);
