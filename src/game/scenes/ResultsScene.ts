@@ -25,7 +25,7 @@ export class ResultsScene extends Phaser.Scene {
     this.add.rectangle(370, 382, 580, 410, 0x102f43).setStrokeStyle(3, colors.cyan);
     const breakdown = [
       ['Arrival', state.arrivalTime], ['Attendance', state.attendanceMarked ? 'Marked ✓' : 'Missing'],
-      ['Coding', `${state.bugsFixed} fixed / ${state.bugsMissed} missed`], ['Bug Bash', state.testerDefeated ? `Tester defeated • ${state.fightHealthRemaining}% HP` : 'QA prevailed'], ['Break quests', `${state.lunchCompleted && state.teaQuestCompleted ? '2/2 complete' : 'Incomplete'}`],
+      ['Coding', `${state.bugsFixed} fixed / ${state.bugsMissed} missed`], ['Bug Bash', state.testerDefeated ? `Won ${state.fightRoundsWon}-${state.fightRoundsLost} • ${state.fightHealthRemaining}% HP` : 'QA prevailed'], ['Break quests', `${state.lunchCompleted && state.teaQuestCompleted ? '2/2 complete' : 'Incomplete'}`],
       ['HR clues', String(state.clues)],
       ['Salary', state.salaryCollected ? 'Collected ✓' : 'Not found'], ['Exit', state.exitTime],
       ['Support attacks', `${state.supportCaught} caught`], ['Bonuses', `+${state.bonuses}`], ['Penalties', `-${state.penalties}`],

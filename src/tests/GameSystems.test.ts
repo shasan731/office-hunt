@@ -41,9 +41,9 @@ describe('game systems', () => {
   });
   it('records a tester-fight victory once and converts damage to energy loss', () => {
     const game = new GameStateManager('normal');
-    game.completeTesterFight(64);
+    game.completeTesterFight(64, 2, 1);
     game.completeTesterFight(100);
-    expect(game.snapshot).toMatchObject({ testerDefeated: true, fightHealthRemaining: 64, energy: 93, score: 528 });
+    expect(game.snapshot).toMatchObject({ testerDefeated: true, fightHealthRemaining: 64, fightRoundsWon: 2, fightRoundsLost: 1, energy: 93, score: 528 });
   });
   it('unlocks achievements from a completed state', () => {
     const game = new GameStateManager('corporate'); game.recordArrival(); game.recordBug(true); game.collectSalary(); game.setTime(1141); game.recordExit();

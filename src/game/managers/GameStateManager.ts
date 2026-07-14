@@ -18,7 +18,8 @@ export class GameStateManager {
       arrivalTime: '--', codingScore: 0, bugsFixed: 0, bugsMissed: 0,
       salaryCollected: false, exitTime: '--', penalties: 0, bonuses: 0,
       clues: 0, clueSources: [], teaBreaks: 0, managerCaught: 0, supportCaught: 0, meetingsHit: 0,
-      attendanceMarked: false, lunchCompleted: false, testerDefeated: false, fightHealthRemaining: 0, teaQuestCompleted: false,
+      attendanceMarked: false, lunchCompleted: false, testerDefeated: false, fightHealthRemaining: 0,
+      fightRoundsWon: 0, fightRoundsLost: 0, teaQuestCompleted: false,
       difficulty, unlockedThisRun: [],
     };
     this.stageCheckpoint = undefined;
@@ -60,12 +61,14 @@ export class GameStateManager {
 
   markAttendance(): void { this.state.attendanceMarked = true; }
   completeLunch(): void { this.state.lunchCompleted = true; this.changeEnergy(25); this.addScore(250); }
-  completeTesterFight(healthRemaining: number): void {
+  completeTesterFight(healthRemaining: number, roundsWon = 2, roundsLost = 1): void {
     if (this.state.testerDefeated) return;
     this.state.testerDefeated = true;
     this.state.fightHealthRemaining = Math.max(0, Math.min(100, Math.round(healthRemaining)));
+    this.state.fightRoundsWon = Math.max(2, Math.min(3, Math.round(roundsWon)));
+    this.state.fightRoundsLost = Math.max(0, Math.min(1, Math.round(roundsLost)));
     this.changeEnergy(-Math.round((100 - this.state.fightHealthRemaining) * 0.2));
-    this.addScore(400 + this.state.fightHealthRemaining * 2);
+    this.addScore(200 + this.state.fightRoundsWon * 100 + this.state.fightHealthRemaining * 2);
   }
   completeTeaQuest(): void { this.state.teaQuestCompleted = true; this.state.teaBreaks += 1; this.changeEnergy(20); this.addScore(200); }
   recordBug(correct: boolean): void {

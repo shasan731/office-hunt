@@ -107,6 +107,7 @@ test('pixel commute vehicles are fatal and show the late-to-office screen', asyn
 });
 
 test('pixel office escape and support-zombie attack initialize safely', async ({ page }) => {
+  test.setTimeout(60_000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await startGame(page, 'Pixel QA');
@@ -118,7 +119,7 @@ test('pixel office escape and support-zombie attack initialize safely', async ({
   expect(await page.evaluate(() => window.__salaryChase?.scene.isActive('EscapeScene'))).toBe(true);
 });
 
-test('retro Bug Bash damages the tester, records a KO, and continues to tea break', async ({ page }) => {
+test('retro Bug Bash plays three rounds and continues to tea break after the match', async ({ page }) => {
   test.setTimeout(60_000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -144,38 +145,77 @@ test('retro Bug Bash damages the tester, records a KO, and continues to tea brea
     const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { testerHealth: number };
     return scene.testerHealth;
   })).toBeLessThan(100);
-  await page.waitForTimeout(400);
-  await page.evaluate(() => {
-    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as {
-      developer: { x: number };
-      tester: { x: number };
-      testerHealth: number;
-      playerActionUntil: number;
-      playerAttack: (kind: 'punch' | 'kick') => void;
-    };
-    scene.developer.x = scene.tester.x - 100;
-    scene.testerHealth = 1;
-    scene.playerActionUntil = 0;
-    scene.playerAttack('punch');
-  });
+
+  const knockOutTester = async (): Promise<void> => {
+    await page.evaluate(() => {
+      const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as {
+        developer: { x: number };
+        tester: { x: number };
+        testerHealth: number;
+        testerActionUntil: number;
+        playerActionUntil: number;
+        introLocked: boolean;
+        playerAttack: (kind: 'punch' | 'kick') => void;
+      };
+      scene.introLocked = false;
+      scene.developer.x = scene.tester.x - 100;
+      scene.testerHealth = 1;
+      scene.testerActionUntil = Number.MAX_SAFE_INTEGER;
+      scene.playerActionUntil = 0;
+      scene.playerAttack('punch');
+    });
+    await expect.poll(() => page.evaluate(() => {
+      const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { ended: boolean };
+      return scene.ended;
+    })).toBe(true);
+  };
+
+  await knockOutTester();
   await expect.poll(() => page.evaluate(() => {
-    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { ended: boolean };
-    return scene.ended;
-  })).toBe(true);
-  await page.waitForTimeout(500);
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { round: number; developerRoundWins: number };
+    return `${scene.round}:${scene.developerRoundWins}`;
+  })).toBe('1:1');
+  await clickGame(page, 640, 475);
+  await expect.poll(() => page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { round: number; ended: boolean };
+    return `${scene.round}:${scene.ended}`;
+  })).toBe('2:false');
+
+  await knockOutTester();
+  await expect.poll(() => page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { round: number; developerRoundWins: number };
+    return `${scene.round}:${scene.developerRoundWins}`;
+  })).toBe('2:2');
+  await clickGame(page, 640, 475);
+  await expect.poll(() => page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { round: number; ended: boolean };
+    return `${scene.round}:${scene.ended}`;
+  })).toBe('3:false');
+
+  await knockOutTester();
   const victory = await page.evaluate(() => {
-    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { ended: boolean; testerHealth: number };
-    return { ended: scene.ended, testerHealth: scene.testerHealth };
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as {
+      ended: boolean;
+      testerHealth: number;
+      round: number;
+      developerRoundWins: number;
+      testerRoundWins: number;
+    };
+    return {
+      ended: scene.ended,
+      testerHealth: scene.testerHealth,
+      round: scene.round,
+      score: `${scene.developerRoundWins}-${scene.testerRoundWins}`,
+    };
   });
-  expect(victory.ended).toBe(true);
-  expect(victory.testerHealth).toBe(0);
+  expect(victory).toEqual({ ended: true, testerHealth: 0, round: 3, score: '3-0' });
   expect(errors).toEqual([]);
   await expect.poll(() => page.evaluate(() => {
     const items = window.__salaryChase?.scene.getScene('FightScene').children.list as Array<{ type: string; text?: string }>;
     return items.filter((item) => item.type === 'Text').map((item) => item.text ?? '');
-  })).toContain('DEVELOPER WINS');
+  })).toContain('DEVELOPER WINS MATCH');
   await page.screenshot({ path: 'test-results/bug-bash-victory.png' });
-  await clickGame(page, 640, 480);
+  await clickGame(page, 640, 485);
   await waitForScene(page, 'TeaBreakScene');
 });
 

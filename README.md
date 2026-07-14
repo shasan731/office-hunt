@@ -13,7 +13,7 @@ The complete game runs in the browser as a static Vite app—no backend, account
 3. Office Arrival
 4. Random coding minigame: Fix the Bugs, Connect the Logic, or Stop Production Errors
 5. Lunch Break food-scavenger adventure
-6. Retro Bug Bash: Developer vs Software Tester
+6. Three-round retro Bug Bash: Developer vs Software Tester
 7. Tea Break mug-and-token quest
 8. Find HR across a complete office map
 9. Salary conversation
@@ -21,6 +21,8 @@ The complete game runs in the browser as a static Vite app—no backend, account
 11. Results, rank, achievements, and persistent high scores
 
 Office interiors and furniture use original programmatic 32-bit-inspired pixel art. During the HR hunt and escape, headset-wearing customer-support zombies may attack with urgent tickets. Hide near the server rack or filing cabinets marked **HIDE**, or keep moving until they lose interest.
+
+The Bug Bash plays all three rounds. Health and the 60-second timer reset for each round, and the developer must win at least two rounds before tea break unlocks.
 
 ## Workday schedule
 

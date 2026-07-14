@@ -54,6 +54,8 @@ export interface GameState {
   lunchCompleted: boolean;
   testerDefeated: boolean;
   fightHealthRemaining: number;
+  fightRoundsWon: number;
+  fightRoundsLost: number;
   teaQuestCompleted: boolean;
   difficulty: Difficulty;
   unlockedThisRun: string[];

@@ -19,8 +19,13 @@ export class FightScene extends Phaser.Scene {
   private developerHealth = 100;
   private testerHealth = 100;
   private seconds = 60;
+  private round = 1;
+  private developerRoundWins = 0;
+  private testerRoundWins = 0;
   private developerBar?: Phaser.GameObjects.Rectangle;
   private testerBar?: Phaser.GameObjects.Rectangle;
+  private developerRoundPips: Phaser.GameObjects.Rectangle[] = [];
+  private testerRoundPips: Phaser.GameObjects.Rectangle[] = [];
   private timerText?: Phaser.GameObjects.Text;
   private statusText?: Phaser.GameObjects.Text;
   private leftKey?: Phaser.Input.Keyboard.Key;
@@ -42,7 +47,7 @@ export class FightScene extends Phaser.Scene {
   constructor() { super('FightScene'); }
 
   create(): void {
-    this.resetRound();
+    this.resetMatch();
     app.state.setTime(WORKDAY_SCHEDULE.fightStart);
     app.state.beginStage('fight');
     this.cameras.main.setBackgroundColor('#10162f');
@@ -86,14 +91,19 @@ export class FightScene extends Phaser.Scene {
     this.updateTester(time, delta);
   }
 
-  private resetRound(): void {
+  private resetMatch(): void {
     this.developer = undefined;
     this.tester = undefined;
     this.developerHealth = 100;
     this.testerHealth = 100;
     this.seconds = 60;
+    this.round = 1;
+    this.developerRoundWins = 0;
+    this.testerRoundWins = 0;
     this.developerBar = undefined;
     this.testerBar = undefined;
+    this.developerRoundPips = [];
+    this.testerRoundPips = [];
     this.timerText = undefined;
     this.statusText = undefined;
     this.touchLeft = false;
@@ -146,6 +156,10 @@ export class FightScene extends Phaser.Scene {
     this.testerBar = this.add.rectangle(1119, 31, 382, 18, colors.orange).setOrigin(1, 0.5).setDepth(102);
     this.add.text(158, 50, 'DEVELOPER', textStyle(12, '#9eeaf2')).setDepth(102);
     this.add.text(1122, 50, 'TESTER', textStyle(12, '#ffad99')).setOrigin(1, 0).setDepth(102);
+    for (let index = 0; index < 3; index += 1) {
+      this.developerRoundPips.push(this.add.rectangle(263 + index * 22, 58, 14, 10, 0x314052).setStrokeStyle(2, colors.white, 0.55).setDepth(102));
+      this.testerRoundPips.push(this.add.rectangle(1017 - index * 22, 58, 14, 10, 0x314052).setStrokeStyle(2, colors.white, 0.55).setDepth(102));
+    }
     this.add.rectangle(640, 39, 70, 62, colors.purple).setStrokeStyle(4, colors.white).setDepth(103);
     this.timerText = this.add.text(640, 39, '60', textStyle(27, '#ffffff')).setOrigin(0.5).setDepth(104);
     this.statusText = this.add.text(640, 99, 'ROUND 1', textStyle(14, '#ffc857')).setOrigin(0.5).setDepth(102);
@@ -180,18 +194,20 @@ export class FightScene extends Phaser.Scene {
   }
 
   private showIntro(): void {
+    const introRound = this.round;
     const panel = this.add.container(640, 350, [
       this.add.rectangle(8, 9, 620, 190, 0x000000, 0.4),
       this.add.rectangle(0, 0, 620, 190, colors.navy, 0.97).setStrokeStyle(6, colors.yellow),
-      this.add.text(0, -52, 'ROUND 1', textStyle(26, '#39d8e8')).setOrigin(0.5),
+      this.add.text(0, -52, `ROUND ${this.round} OF 3`, textStyle(26, '#39d8e8')).setOrigin(0.5),
       this.add.text(0, 4, 'REQUIREMENTS  VS  REALITY', textStyle(32, '#ffc857')).setOrigin(0.5),
       this.add.text(0, 59, 'FIGHT!', textStyle(38, '#ff7a59')).setOrigin(0.5),
     ]).setDepth(180);
     this.time.delayedCall(950, () => {
       panel.destroy();
+      if (this.round !== introRound || this.ended) return;
       this.introLocked = false;
       this.nextTesterAttack = this.time.now + 900;
-      this.statusText?.setText('DEFEND THE BUILD');
+      this.statusText?.setText(`ROUND ${this.round} • DEFEND THE BUILD`);
       app.audio.play('warning');
     });
   }
@@ -362,43 +378,108 @@ export class FightScene extends Phaser.Scene {
     this.touchLeft = false;
     this.touchRight = false;
     this.touchBlock = false;
-    if (won) {
-      app.state.completeTesterFight(this.developerHealth);
+    if (won) this.developerRoundWins += 1;
+    else this.testerRoundWins += 1;
+    this.refreshRoundPips();
+
+    if (this.round < 3) {
+      app.audio.play(won ? 'correct' : 'wrong');
+      this.showRoundResult(won, reason);
+      return;
+    }
+
+    const matchWon = this.developerRoundWins >= 2;
+    if (matchWon) {
+      app.state.completeTesterFight(this.developerHealth, this.developerRoundWins, this.testerRoundWins);
       app.state.setTime(WORKDAY_SCHEDULE.fightEnd);
       app.state.unlock('qa-approved');
       app.audio.play('salary');
     } else {
       app.audio.play('wrong');
     }
-    this.showResult(won, reason);
+    this.showMatchResult(matchWon, reason);
   }
 
-  private showResult(won: boolean, reason: 'KO' | 'TIME'): void {
-    const reward = 400 + this.developerHealth * 2;
+  private refreshRoundPips(): void {
+    this.developerRoundPips.forEach((pip, index) => pip.setFillStyle(index < this.developerRoundWins ? colors.green : 0x314052));
+    this.testerRoundPips.forEach((pip, index) => pip.setFillStyle(index < this.testerRoundWins ? colors.orange : 0x314052));
+  }
+
+  private showRoundResult(won: boolean, reason: 'KO' | 'TIME'): void {
+    const overlay = this.add.container(640, 350, [
+      this.add.rectangle(0, 10, 1280, 720, colors.navy, 0.7).setInteractive(),
+      this.add.rectangle(0, 0, 720, 390, colors.navy, 0.98).setStrokeStyle(7, won ? colors.green : colors.orange),
+      this.add.text(0, -125, reason === 'KO' ? 'KNOCKOUT!' : 'ROUND TIME!', textStyle(23, '#39d8e8')).setOrigin(0.5),
+      this.add.text(0, -68, `ROUND ${this.round}: ${won ? 'DEVELOPER' : 'TESTER'} WINS`, textStyle(35, won ? '#ffc857' : '#ff7a59')).setOrigin(0.5),
+      this.add.text(
+        0,
+        4,
+        won
+          ? 'One bug closed. The tester has quietly opened two more tabs.'
+          : 'The build was returned with the devastating note: “Steps to reproduce attached.”',
+        { ...textStyle(18, '#d9eef7'), align: 'center', wordWrap: { width: 590 } },
+      ).setOrigin(0.5),
+      this.add.text(0, 68, `MATCH SCORE  ${this.developerRoundWins} – ${this.testerRoundWins}`, textStyle(21, '#8ff0c8')).setOrigin(0.5),
+    ]).setDepth(190);
+    overlay.add(addButton(this, 0, 125, `START ROUND ${this.round + 1}`, () => {
+      overlay.destroy();
+      this.startNextRound();
+    }, 330, won ? colors.green : colors.orange));
+  }
+
+  private startNextRound(): void {
+    if (!this.developer || !this.tester) return;
+    this.round += 1;
+    this.developerHealth = 100;
+    this.testerHealth = 100;
+    this.seconds = 60;
+    this.developer.x = 330;
+    this.developer.y = 505;
+    this.tester.x = 950;
+    this.tester.y = 505;
+    this.resetPose(this.developer);
+    this.resetPose(this.tester);
+    this.timerText?.setText('60');
+    this.statusText?.setText(`ROUND ${this.round}`);
+    this.playerActionUntil = 0;
+    this.testerActionUntil = 0;
+    this.nextTesterAttack = 0;
+    this.touchLeft = false;
+    this.touchRight = false;
+    this.touchBlock = false;
+    this.introLocked = true;
+    this.ended = false;
+    this.refreshHealthBars();
+    this.showIntro();
+  }
+
+  private showMatchResult(won: boolean, reason: 'KO' | 'TIME'): void {
+    const reward = 200 + this.developerRoundWins * 100 + this.developerHealth * 2;
     this.add.rectangle(640, 360, 1280, 720, colors.navy, 0.72).setDepth(190).setInteractive();
-    this.add.rectangle(640, 340, 760, 430, colors.navy, 0.98).setStrokeStyle(7, won ? colors.green : colors.orange).setDepth(191);
-    this.add.text(640, 190, reason === 'KO' ? 'KNOCKOUT!' : 'TIME!', textStyle(25, '#39d8e8')).setOrigin(0.5).setDepth(192);
-    this.add.text(640, 245, won ? 'DEVELOPER WINS' : 'TESTER WINS', textStyle(44, won ? '#ffc857' : '#ff7a59')).setOrigin(0.5).setDepth(192);
+    this.add.rectangle(640, 340, 790, 440, colors.navy, 0.98).setStrokeStyle(7, won ? colors.green : colors.orange).setDepth(191);
+    this.add.text(640, 175, reason === 'KO' ? 'FINAL KNOCKOUT!' : 'FINAL BELL!', textStyle(25, '#39d8e8')).setOrigin(0.5).setDepth(192);
+    this.add.text(640, 230, won ? 'DEVELOPER WINS MATCH' : 'TESTER WINS MATCH', textStyle(40, won ? '#ffc857' : '#ff7a59')).setOrigin(0.5).setDepth(192);
+    this.add.text(640, 276, `THREE-ROUND SCORE  ${this.developerRoundWins} – ${this.testerRoundWins}`, textStyle(21, '#ffffff')).setOrigin(0.5).setDepth(192);
     this.add.text(
       640,
-      315,
+      330,
       won
-        ? 'The tester accepts the build with one condition: “Please stop calling bugs undocumented features.”'
-        : 'The tester found an edge case in your health bar. The ticket has been reopened.',
-      { ...textStyle(18, '#d9eef7'), align: 'center', wordWrap: { width: 640 } },
+        ? 'QA approves the build after three rounds and only seventeen new tickets.'
+        : 'QA wins the review. Your health bar has been marked “needs revision.”',
+      { ...textStyle(18, '#d9eef7'), align: 'center', wordWrap: { width: 650 } },
     ).setOrigin(0.5).setDepth(192);
     this.add.text(
       640,
-      390,
-      won ? `Health remaining: ${this.developerHealth}%  •  Fight bonus: +${reward}` : 'Patch yourself, review the requirements, and try the round again.',
+      395,
+      won ? `Final-round health: ${this.developerHealth}%  •  Match bonus: +${reward}` : 'Win at least two of the three rounds to escape into tea break.',
       textStyle(17, won ? '#8ff0c8' : '#ffc857'),
     ).setOrigin(0.5).setDepth(192);
-    addButton(this, 640, 480, won ? 'CLAIM TEA BREAK' : 'RETRY THE TEST', () => {
+    addButton(this, 640, 485, won ? 'CLAIM TEA BREAK' : 'RETRY 3-ROUND MATCH', () => {
       if (won) this.scene.start('TeaBreakScene');
       else {
         app.state.restoreStageCheckpoint();
         this.scene.restart();
       }
-    }, 350, won ? colors.green : colors.orange).setDepth(193);
+    }, 370, won ? colors.green : colors.orange).setDepth(193);
   }
 }
