@@ -1,4 +1,4 @@
-# Salary Chase
+# Office Hunt
 
 A colorful seven-level Phaser 3 office adventure. Commute by bus and boat, beat five flights of stairs, repair absurd code, survive office hazards, battle QA, hunt HR, collect a fictional salary, and escape before another meeting begins.
 
@@ -106,7 +106,7 @@ Keep the existing JSON shape. Invalid or corrupted player save data is recovered
 ```bash
 git init
 git add .
-git commit -m "Build Salary Chase"
+git commit -m "Build Office Hunt"
 git branch -M main
 git remote add origin <repository-url>
 git push -u origin main

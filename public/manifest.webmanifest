@@ -1,6 +1,6 @@
 {
-  "name": "Salary Chase",
-  "short_name": "Salary Chase",
+  "name": "Office Hunt",
+  "short_name": "Office Hunt",
   "description": "A colorful office adventure about surviving one workday.",
   "start_url": "/",
   "display": "standalone",

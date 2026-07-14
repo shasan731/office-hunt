@@ -24,7 +24,7 @@ export class MainMenuScene extends Phaser.Scene {
     }
     for (let x = 20; x < 1280; x += 120) this.add.rectangle(x, 679, 62, 6, colors.white, 0.55);
     this.add.rectangle(920, 380, 540, 480, colors.white, 0.92).setStrokeStyle(5, colors.navy);
-    this.add.text(650, 125, 'SALARY\nCHASE', { ...textStyle(72, '#071a2b'), lineSpacing: -10 });
+    this.add.text(650, 125, 'OFFICE\nHUNT', { ...textStyle(72, '#071a2b'), lineSpacing: -10 });
     this.add.text(654, 320, 'Seven levels. One salary. Many meetings.', textStyle(19, '#7c5ce7'));
     addPerson(this, 270, 390, colors.blue).setScale(2.8);
     this.add.rectangle(275, 570, 420, 80, colors.yellow).setStrokeStyle(4, colors.navy);
