@@ -1,4 +1,4 @@
-# SoftifyBD: Salary Chase
+# Salary Chase
 
 A lightweight, colorful Phaser 3 office adventure. Commute through absurd traffic, mark attendance, repair urgent code, follow clues to a mobile HR employee, collect a fictional salary, and dodge “one small change” on the way out.
 
@@ -50,7 +50,7 @@ Add future captures under `docs/screenshots/`, for example:
 
 ```bash
 git clone <repository-url>
-cd softifybd-salary-chase
+cd office-hunt
 npm install
 npm run dev
 ```
@@ -80,6 +80,10 @@ The production output is written to `dist/`.
 
 Settings persist in localStorage and include difficulty, sound, reduced motion, high contrast, and larger text. Sound starts muted and uses the Web Audio API only after player interaction.
 
+- Casual gives the player a small movement boost, fewer coding tasks, slower hazards, and fewer support zombies.
+- Normal uses balanced movement, workload, hazards, and attacks.
+- Corporate adds coding tasks and clues while accelerating hazards, the office clock, HR, and support attacks.
+
 ## Content editing
 
 All gameplay content is local and data-driven:
@@ -99,7 +103,7 @@ Keep the existing JSON shape. Invalid or corrupted player save data is recovered
 ```bash
 git init
 git add .
-git commit -m "Build SoftifyBD Salary Chase"
+git commit -m "Build Salary Chase"
 git branch -M main
 git remote add origin <repository-url>
 git push -u origin main
@@ -124,4 +128,4 @@ Scenes are separated under `src/game/scenes`; state, persistence, time, and audi
 
 ## License and disclaimer
 
-This is a fictional workplace comedy. Characters and events are fictional. The SoftifyBD name is used for this specific project. Artwork and audio are original programmatic assets. Only add real company logos when the owner has granted permission.
+This is a fictional workplace comedy. Characters and events are fictional. Artwork and audio are original programmatic assets. Only add real company logos when the owner has granted permission.

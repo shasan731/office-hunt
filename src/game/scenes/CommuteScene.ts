@@ -12,13 +12,17 @@ export class CommuteScene extends BaseScene {
   constructor() { super('CommuteScene'); }
 
   create(): void {
-    this.setupWorld('1 / Commute', 'Reach SoftifyBD before traffic achieves sentience.', 80, 610);
+    this.obstacles = [];
+    this.tea = undefined;
+    this.office = undefined;
+    this.cooldown = false;
+    this.setupWorld('1 / Commute', 'Reach the office before traffic achieves sentience.', 80, 610);
     this.add.rectangle(640, 390, 1280, 500, 0x596d78);
     for (let y = 180; y < 650; y += 120) for (let x = 0; x < 1280; x += 160) this.add.rectangle(x + 45, y, 80, 8, colors.white, 0.75);
     this.add.rectangle(70, 600, 115, 105, colors.yellow).setStrokeStyle(4, colors.navy);
     this.add.text(70, 525, 'HOME', textStyle(18, '#071a2b')).setOrigin(0.5);
     this.office = this.add.rectangle(1190, 170, 145, 110, colors.blue).setStrokeStyle(5, colors.navy);
-    this.add.text(1190, 158, 'SOFTIFYBD\nOFFICE', { ...textStyle(19), align: 'center' }).setOrigin(0.5);
+    this.add.text(1190, 158, 'MAIN\nOFFICE', { ...textStyle(19), align: 'center' }).setOrigin(0.5);
     const obstacleData = [
       [260, 220, 95, 45, colors.orange], [520, 360, 150, 50, colors.yellow], [820, 220, 80, 58, colors.purple],
       [1000, 475, 130, 46, colors.green], [650, 590, 100, 42, colors.orange], [350, 495, 65, 65, 0x35515c],
@@ -34,7 +38,7 @@ export class CommuteScene extends BaseScene {
   update(time: number, delta: number): void {
     this.updateMovement(time, delta);
     this.obstacles.forEach((obstacle, index) => {
-      obstacle.x += Number(obstacle.getData('direction')) * (25 + index * 5) * app.difficulty.speed * delta / 1000;
+      obstacle.x += Number(obstacle.getData('direction')) * (25 + index * 5) * app.difficulty.hazardSpeed * delta / 1000;
       if (obstacle.x < 160 || obstacle.x > 1120) obstacle.setData('direction', -Number(obstacle.getData('direction')));
       if (!this.cooldown && this.isNear(obstacle, 58)) this.collide();
     });

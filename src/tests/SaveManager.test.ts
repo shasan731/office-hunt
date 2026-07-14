@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SAVE_KEY, SaveManager } from '../game/managers/SaveManager';
+import { LEGACY_SAVE_KEY, SAVE_KEY, SaveManager } from '../game/managers/SaveManager';
 
 class MemoryStorage {
   private values = new Map<string, string>();
@@ -17,6 +17,20 @@ describe('SaveManager', () => {
     const storage = new MemoryStorage(); const save = new SaveManager(storage);
     save.updateSettings({ difficulty: 'corporate', highContrast: true });
     expect(new SaveManager(storage).getData().settings).toMatchObject({ difficulty: 'corporate', highContrast: true });
+  });
+  it('migrates the legacy branded save key without losing settings', () => {
+    const storage = new MemoryStorage();
+    storage.setItem(LEGACY_SAVE_KEY, JSON.stringify({
+      version: 1,
+      highScores: [],
+      settings: { difficulty: 'casual', muted: false, reducedMotion: true, highContrast: false, largeText: false },
+      tutorialCompleted: true,
+      achievements: ['salary-secured'],
+    }));
+    const save = new SaveManager(storage);
+    expect(save.getData().settings).toMatchObject({ difficulty: 'casual', muted: false, reducedMotion: true });
+    expect(storage.getItem(SAVE_KEY)).not.toBeNull();
+    expect(storage.getItem(LEGACY_SAVE_KEY)).toBeNull();
   });
   it('sorts and limits high scores', () => {
     const save = new SaveManager(new MemoryStorage());

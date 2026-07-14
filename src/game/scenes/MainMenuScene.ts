@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { app } from '../managers/AppContext';
 import type { Difficulty } from '../types/game';
 import { addButton, addPerson, colors, textStyle } from '../ui';
+import difficultyData from '../../data/difficulty.json';
 
 export class MainMenuScene extends Phaser.Scene {
   private panel?: Phaser.GameObjects.Container;
@@ -11,8 +12,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#a9edf0');
     for (let i = 0; i < 12; i += 1) this.add.circle(i * 120 + 30, 680 - (i % 3) * 18, 75, i % 2 ? colors.cyan : colors.green, 0.18);
     this.add.rectangle(920, 380, 540, 480, colors.white, 0.92).setStrokeStyle(5, colors.navy);
-    this.add.text(650, 120, 'SOFTIFYBD', textStyle(30, '#087ea4'));
-    this.add.text(650, 160, 'SALARY\nCHASE', { ...textStyle(72, '#071a2b'), lineSpacing: -10 });
+    this.add.text(650, 125, 'SALARY\nCHASE', { ...textStyle(72, '#071a2b'), lineSpacing: -10 });
     this.add.text(654, 320, 'Code. Chase HR. Escape on time.', textStyle(20, '#7c5ce7'));
     addPerson(this, 270, 390, colors.blue).setScale(2.8);
     this.add.rectangle(275, 570, 420, 80, colors.yellow).setStrokeStyle(4, colors.navy);
@@ -58,6 +58,7 @@ export class MainMenuScene extends Phaser.Scene {
     difficulties.forEach((difficulty, index) => panel.add(addButton(this, -230 + index * 230, -150, difficulty.toUpperCase(), () => {
       app.save.updateSettings({ difficulty }); this.scene.restart();
     }, 190, settings.difficulty === difficulty ? colors.orange : colors.blue)));
+    panel.add(this.add.text(0, -105, difficultyData[settings.difficulty].description, textStyle(14, '#425466')).setOrigin(0.5));
     const toggles: Array<[string, 'muted' | 'reducedMotion' | 'highContrast' | 'largeText']> = [
       ['SOUND', 'muted'], ['REDUCED MOTION', 'reducedMotion'], ['HIGH CONTRAST', 'highContrast'], ['LARGE TEXT', 'largeText'],
     ];
@@ -67,7 +68,8 @@ export class MainMenuScene extends Phaser.Scene {
         const value = key === 'muted' ? !settings.muted : !settings[key];
         app.save.updateSettings({ [key]: value });
         if (key === 'muted') app.audio.setMuted(value);
-        document.body.classList.toggle('high-contrast', key === 'highContrast' && value);
+        if (key === 'highContrast') document.body.classList.toggle('high-contrast', value);
+        if (key === 'largeText') document.body.classList.toggle('large-text', value);
         this.showSettings();
       }, 340, enabled ? colors.green : colors.navy));
     });

@@ -9,7 +9,9 @@ export class SalaryScene extends Phaser.Scene {
   private content?: Phaser.GameObjects.Container;
   constructor() { super('SalaryScene'); }
   create(): void {
-    app.state.setStage('salary'); this.cameras.main.setBackgroundColor('#d8f5f7');
+    this.step = 0;
+    this.content = undefined;
+    app.state.beginStage('salary'); this.cameras.main.setBackgroundColor('#d8f5f7');
     drawPixelFloor(this, 0xdaf0e8, 0xc8e1d8);
     this.add.rectangle(640, 390, 1080, 530, colors.white).setStrokeStyle(6, colors.navy);
     addPixelCabinet(this, 135, 500, 'PAYROLL');

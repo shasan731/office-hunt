@@ -19,7 +19,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   width: 1280,
   height: 720,
   backgroundColor: '#071a2b',
-  render: { antialias: true, pixelArt: false, roundPixels: true },
+  render: { antialias: false, pixelArt: true, roundPixels: true },
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   input: { activePointers: 3 },
   dom: { createContainer: true },

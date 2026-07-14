@@ -10,8 +10,10 @@ export class LobbyScene extends BaseScene {
   private desk?: Phaser.GameObjects.Container;
   constructor() { super('LobbyScene'); }
   create(): void {
-    app.state.advanceTime(4);
+    this.device = undefined;
+    this.desk = undefined;
     this.setupWorld('2 / Arrival', 'Mark attendance, then reach your desk.', 90, 600);
+    app.state.advanceTime(4);
     drawPixelFloor(this, 0xf6edda, 0xe9dec6);
     addPixelRoom(this, 210, 220, 280, 205, colors.cyan, 'ATTENDANCE ZONE');
     addPixelRoom(this, 1030, 220, 300, 205, colors.orange, 'DEVELOPER DESK');

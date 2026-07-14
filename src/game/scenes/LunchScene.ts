@@ -26,11 +26,15 @@ export class LunchScene extends BaseScene {
   constructor() { super('LunchScene'); }
 
   create(): void {
+    this.items = [];
+    this.rivals = [];
+    this.table = undefined;
+    this.collisionCooldown = false;
     app.state.setTime(WORKDAY_SCHEDULE.lunchStart);
     this.setupWorld('4 / Lunch Break', 'Assemble lunch: plate, rice, curry, then claim a table.', 105, 610);
     drawPixelFloor(this, 0xf5dfb5, 0xe9ca91);
     addPixelCounter(this, 640, 130, 1080, 'CAFETERIA SERVICE COUNTER', colors.orange);
-    this.add.text(640, 125, 'SOFTIFYBD CAFETERIA — QUEUE COMPLEXITY: O(n²)', textStyle(18)).setOrigin(0.5);
+    this.add.text(640, 125, 'OFFICE CAFETERIA — QUEUE COMPLEXITY: O(n²)', textStyle(18)).setOrigin(0.5);
     for (let x = 280; x <= 940; x += 330) {
       addPixelTable(this, x, 440, 190);
       addPixelChair(this, x - 65, 520, colors.blue);
@@ -52,7 +56,7 @@ export class LunchScene extends BaseScene {
   update(time: number, delta: number): void {
     this.updateMovement(time, delta, 205);
     this.rivals.forEach((rival, index) => {
-      rival.person.x += rival.direction * (28 + index * 7) * app.difficulty.speed * delta / 1000;
+      rival.person.x += rival.direction * (28 + index * 7) * app.difficulty.hazardSpeed * delta / 1000;
       if (rival.person.x < 170 || rival.person.x > 1060) rival.direction *= -1;
       if (!app.save.getData().settings.reducedMotion) animatePerson(rival.person, true, time);
       if (!this.collisionCooldown && this.isNear(rival.person, 55)) this.bumpLunchQueue();

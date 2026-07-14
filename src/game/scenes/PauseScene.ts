@@ -11,7 +11,12 @@ export class PauseScene extends Phaser.Scene {
     this.add.text(640, 130, 'COFFEE BREAK', textStyle(46, '#ffc857')).setOrigin(0.5);
     this.add.text(640, 185, 'The workday is paused. Miracles happen.', textStyle(18)).setOrigin(0.5);
     addButton(this, 640, 275, 'RESUME', () => this.resume(), 340, colors.green);
-    addButton(this, 640, 345, 'RESTART STAGE', () => { this.scene.stop(this.pausedScene); this.scene.stop(); this.scene.start(this.pausedScene); }, 340, colors.blue);
+    addButton(this, 640, 345, 'RESTART STAGE', () => {
+      app.state.restoreStageCheckpoint();
+      this.scene.stop(this.pausedScene);
+      this.scene.stop();
+      this.scene.start(this.pausedScene);
+    }, 340, colors.blue);
     addButton(this, 640, 415, `SOUND: ${app.audio.isMuted ? 'OFF' : 'ON'}`, () => {
       const muted = !app.audio.isMuted; app.audio.setMuted(muted); app.save.updateSettings({ muted }); this.scene.restart({ pausedScene: this.pausedScene });
     }, 340, colors.purple);

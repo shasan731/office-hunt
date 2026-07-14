@@ -26,6 +26,12 @@ export class EscapeScene extends BaseScene {
   constructor() { super('EscapeScene'); }
 
   create(): void {
+    this.traps = [];
+    this.exit = undefined;
+    this.hideSpots = [];
+    this.supportAttacks = undefined;
+    this.hidden = false;
+    this.collisionCooldown = false;
     this.setupWorld('8 / Escape', 'Reach EXIT. Use cabinets marked HIDE when support zombies attack.', 110, 610);
     drawPixelFloor(this, 0xe8e2f2, 0xd8d0e7);
     for (let x = 260; x < 1100; x += 270) {
@@ -56,11 +62,11 @@ export class EscapeScene extends BaseScene {
       getPlayer: () => this.player,
       isHidden: () => this.hidden || this.movementLocked,
       onCaught: () => this.caughtBySupport(),
-      minDelay: 2400,
-      maxDelay: 4300,
-      speed: 132 * app.difficulty.speed,
-      maxActive: app.state.snapshot.difficulty === 'corporate' ? 3 : 2,
-      firstDelay: 900,
+      minDelay: Math.round(2400 * app.difficulty.supportDelayScale),
+      maxDelay: Math.round(4300 * app.difficulty.supportDelayScale),
+      speed: 132 * app.difficulty.hazardSpeed,
+      maxActive: app.difficulty.supportMaxActive,
+      firstDelay: Math.round(900 * app.difficulty.supportDelayScale),
     });
   }
 
@@ -77,7 +83,7 @@ export class EscapeScene extends BaseScene {
     this.traps.forEach((trap, index) => {
       if (!trap.active) return;
       if (!app.save.getData().settings.reducedMotion) animatePerson(trap.person, true, time);
-      trap.person.x += trap.direction * (35 + index * 4) * app.difficulty.speed * delta / 1000;
+      trap.person.x += trap.direction * (35 + index * 4) * app.difficulty.hazardSpeed * delta / 1000;
       if (trap.person.x < 150 || trap.person.x > 1120) trap.direction *= -1;
       if (!this.collisionCooldown && this.isNear(trap.person, 57)) this.hitTrap(trap);
     });

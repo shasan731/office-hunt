@@ -20,7 +20,14 @@ export class CodingScene extends Phaser.Scene {
   constructor() { super('CodingScene'); }
 
   create(): void {
-    app.state.setStage('coding');
+    this.index = 0;
+    this.seconds = 42;
+    this.timerText = undefined;
+    this.content = undefined;
+    this.ended = false;
+    this.answerLocked = false;
+    this.errorItems = [];
+    app.state.beginStage('coding');
     this.mode = Phaser.Utils.Array.GetRandom<Mode>(['bugs', 'logic', 'errors']);
     this.targetCount = app.difficulty.codingCount;
     this.cameras.main.setBackgroundColor('#071a2b');
@@ -35,6 +42,7 @@ export class CodingScene extends Phaser.Scene {
       delay: 1000,
       repeat: this.seconds,
       callback: () => {
+        if (this.ended) return;
         this.seconds -= 1;
         this.timerText?.setText(`00:${Math.max(0, this.seconds).toString().padStart(2, '0')}`);
         if (this.seconds <= 0) this.finish();
@@ -52,7 +60,7 @@ export class CodingScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     if (this.mode !== 'errors' || this.ended) return;
     this.errorItems.forEach((item) => {
-      item.x += 95 * app.difficulty.speed * delta / 1000;
+      item.x += 95 * app.difficulty.hazardSpeed * delta / 1000;
       if (item.active && item.x > 1010) {
         item.setActive(false).setVisible(false);
         app.state.recordBug(false);
@@ -119,7 +127,7 @@ export class CodingScene extends Phaser.Scene {
       .setSize(270, 62)
       .setInteractive({ useHandCursor: true });
     item.once('pointerdown', () => {
-      if (!item.active) return;
+      if (!item.active || this.ended) return;
       item.setActive(false).setVisible(false);
       this.index += 1;
       app.state.recordBug(true);
@@ -148,6 +156,7 @@ export class CodingScene extends Phaser.Scene {
     ]).setDepth(50);
     this.time.delayedCall(700, () => {
       banner.destroy();
+      if (this.ended) return;
       if (correct || advanceOnWrong) this.index += 1;
       this.answerLocked = false;
       if (this.index >= this.targetCount) this.finish();
@@ -168,6 +177,8 @@ export class CodingScene extends Phaser.Scene {
   private finish(): void {
     if (this.ended) return;
     this.ended = true;
+    this.answerLocked = true;
+    this.errorItems.forEach((item) => item.disableInteractive());
     this.content?.removeAll(true);
     if (this.seconds > 15) app.state.addScore(300);
     if (app.state.snapshot.bugsMissed === 0) app.state.unlock('bug-destroyer');

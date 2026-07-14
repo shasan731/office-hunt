@@ -26,6 +26,10 @@ export class TeaBreakScene extends BaseScene {
   constructor() { super('TeaBreakScene'); }
 
   create(): void {
+    this.parts = [];
+    this.invites = [];
+    this.teaStall = undefined;
+    this.cooldown = false;
     app.state.setTime(WORKDAY_SCHEDULE.teaStart);
     this.setupWorld('5 / Tea Break', 'Find your mug and tea token, then reach the pantry by 4:45 PM.', 100, 590);
     drawPixelFloor(this, 0xd8edf5, 0xc6e0ea);
@@ -49,7 +53,7 @@ export class TeaBreakScene extends BaseScene {
   update(time: number, delta: number): void {
     this.updateMovement(time, delta, 215);
     this.invites.forEach((invite, index) => {
-      invite.person.x += invite.direction * (35 + index * 8) * app.difficulty.speed * delta / 1000;
+      invite.person.x += invite.direction * (35 + index * 8) * app.difficulty.hazardSpeed * delta / 1000;
       if (invite.person.x < 180 || invite.person.x > 1040) invite.direction *= -1;
       if (!app.save.getData().settings.reducedMotion) animatePerson(invite.person, true, time);
       if (!this.cooldown && this.isNear(invite.person, 55)) this.hitInvite();

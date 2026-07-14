@@ -45,6 +45,7 @@ export interface GameState {
   penalties: number;
   bonuses: number;
   clues: number;
+  clueSources: string[];
   teaBreaks: number;
   managerCaught: number;
   supportCaught: number;
@@ -58,9 +59,13 @@ export interface GameState {
 
 export interface DifficultyConfig {
   label: string;
-  speed: number;
+  description: string;
+  playerSpeed: number;
+  hazardSpeed: number;
   timeScale: number;
   codingCount: number;
   hrMoveMs: number;
   clueLimit: number;
+  supportDelayScale: number;
+  supportMaxActive: number;
 }

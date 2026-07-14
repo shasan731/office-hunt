@@ -9,7 +9,7 @@ import { addButton, colors, textStyle } from '../ui';
 export class ResultsScene extends Phaser.Scene {
   constructor() { super('ResultsScene'); }
   create(): void {
-    app.state.setStage('results');
+    app.state.beginStage('results');
     const state = app.state.snapshot;
     calculateAchievements(state).forEach((id) => app.state.unlock(id));
     app.save.unlock(app.state.snapshot.unlockedThisRun);

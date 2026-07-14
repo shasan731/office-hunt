@@ -18,8 +18,13 @@ export abstract class BaseScene extends Phaser.Scene {
 
   protected setupWorld(stageLabel: string, objective: string, startX = 90, startY = 400): void {
     const settings = app.save.getData().settings;
+    this.player = undefined;
+    this.movementLocked = false;
+    this.touch = { left: false, right: false, up: false, down: false };
+    this.dialog = undefined;
+    this.lastTick = this.time.now;
     this.cameras.main.setBackgroundColor(settings.highContrast ? '#02070c' : '#d8f5f7');
-    app.state.setStage(this.keyToStage());
+    app.state.beginStage(this.keyToStage());
     this.player = addPerson(this, startX, startY, colors.blue).setDepth(20);
     this.cursors = this.input.keyboard?.createCursorKeys();
     this.keys = this.input.keyboard?.addKeys('W,A,S,D,E') as Record<'W' | 'A' | 'S' | 'D' | 'E', Phaser.Input.Keyboard.Key>;
@@ -58,8 +63,8 @@ export abstract class BaseScene extends Phaser.Scene {
       Number(this.cursors?.right.isDown || this.keys?.D.isDown || this.touch.right) - Number(this.cursors?.left.isDown || this.keys?.A.isDown || this.touch.left),
       Number(this.cursors?.down.isDown || this.keys?.S.isDown || this.touch.down) - Number(this.cursors?.up.isDown || this.keys?.W.isDown || this.touch.up),
     ).normalize();
-    this.player.x = Phaser.Math.Clamp(this.player.x + direction.x * speed * app.difficulty.speed * delta / 1000, 24, 1256);
-    this.player.y = Phaser.Math.Clamp(this.player.y + direction.y * speed * app.difficulty.speed * delta / 1000, 105, 680);
+    this.player.x = Phaser.Math.Clamp(this.player.x + direction.x * speed * app.difficulty.playerSpeed * delta / 1000, 24, 1256);
+    this.player.y = Phaser.Math.Clamp(this.player.y + direction.y * speed * app.difficulty.playerSpeed * delta / 1000, 105, 680);
     const moving = direction.lengthSq() > 0;
     if (moving && !app.save.getData().settings.reducedMotion) this.player.rotation = Math.sin(time / 80) * 0.018;
     else this.player.rotation = 0;

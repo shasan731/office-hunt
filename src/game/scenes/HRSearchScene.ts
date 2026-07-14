@@ -26,17 +26,22 @@ export class HRSearchScene extends BaseScene {
   ];
   constructor() { super('HRSearchScene'); }
   create(): void {
+    this.npcs = [];
+    this.hr = undefined;
+    this.clueArrow = undefined;
+    this.supportAttacks = undefined;
+    this.hrRoute = 0;
     this.setupWorld('6 / Find HR', 'Ask for clues. Hide near the server rack if support zombies attack.', 120, 610);
     this.drawOffice(); this.createNpcs();
     this.supportAttacks = new SupportAttackSystem(this, {
       getPlayer: () => this.player,
       isHidden: () => this.movementLocked || Boolean(this.player && Phaser.Math.Distance.Between(this.player.x, this.player.y, 460, 390) < 78),
       onCaught: () => this.caughtBySupport(),
-      minDelay: 7500,
-      maxDelay: 12000,
-      speed: 92 * app.difficulty.speed,
-      maxActive: 1,
-      firstDelay: 5000,
+      minDelay: Math.round(7500 * app.difficulty.supportDelayScale),
+      maxDelay: Math.round(12000 * app.difficulty.supportDelayScale),
+      speed: 92 * app.difficulty.hazardSpeed,
+      maxActive: Math.min(2, app.difficulty.supportMaxActive),
+      firstDelay: Math.round(5000 * app.difficulty.supportDelayScale),
     });
     this.time.addEvent({ delay: app.difficulty.hrMoveMs, loop: true, callback: () => this.moveHr() });
   }
@@ -58,7 +63,11 @@ export class HRSearchScene extends BaseScene {
       this.showDialog('HR', 'You found me! Is this about the highly anticipated monthly notification?', () => this.scene.start('SalaryScene'));
       return;
     }
-    app.state.addClue(); app.audio.play('correct');
+    if (!app.state.addClue(near.id)) {
+      this.showDialog(near.role, 'I already gave you my best clue. My second-best clue is “try asking someone else.”');
+      return;
+    }
+    app.audio.play('correct');
     const lines = dialogueData[near.dialogueKey];
     this.showDialog(near.role, Phaser.Utils.Array.GetRandom(lines));
     this.updateObjective(`${app.state.snapshot.clues} clue${app.state.snapshot.clues === 1 ? '' : 's'} collected. ${app.state.snapshot.clues >= app.difficulty.clueLimit ? 'HR is now marked by the arrow!' : 'Keep asking colleagues.'}`);
