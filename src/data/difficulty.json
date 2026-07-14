@@ -1,7 +1,7 @@
 {
   "casual": {
     "label": "Casual",
-    "description": "Faster employee, fewer tasks, slower hazards, one zombie.",
+    "description": "Faster employee, fewer tasks, gentler tester, slower hazards, one zombie.",
     "playerSpeed": 1.08,
     "hazardSpeed": 0.72,
     "timeScale": 0.8,
@@ -9,7 +9,14 @@
     "hrMoveMs": 6000,
     "clueLimit": 2,
     "supportDelayScale": 1.35,
-    "supportMaxActive": 1
+    "supportMaxActive": 1,
+    "fightPlayerSpeed": 260,
+    "fightTesterSpeed": 105,
+    "fightTesterDamage": 7,
+    "fightTesterCooldown": 1200,
+    "fightPunchDamage": 14,
+    "fightKickDamage": 21,
+    "fightBlockMultiplier": 0.2
   },
   "normal": {
     "label": "Normal",
@@ -21,11 +28,18 @@
     "hrMoveMs": 4500,
     "clueLimit": 3,
     "supportDelayScale": 1,
-    "supportMaxActive": 2
+    "supportMaxActive": 2,
+    "fightPlayerSpeed": 235,
+    "fightTesterSpeed": 140,
+    "fightTesterDamage": 10,
+    "fightTesterCooldown": 940,
+    "fightPunchDamage": 12,
+    "fightKickDamage": 18,
+    "fightBlockMultiplier": 0.3
   },
   "corporate": {
     "label": "Corporate",
-    "description": "More tasks, faster hazards, quicker clock, three zombies.",
+    "description": "More tasks, fierce tester, faster hazards, quicker clock, three zombies.",
     "playerSpeed": 0.96,
     "hazardSpeed": 1.3,
     "timeScale": 1.25,
@@ -33,6 +47,13 @@
     "hrMoveMs": 3000,
     "clueLimit": 5,
     "supportDelayScale": 0.72,
-    "supportMaxActive": 3
+    "supportMaxActive": 3,
+    "fightPlayerSpeed": 220,
+    "fightTesterSpeed": 175,
+    "fightTesterDamage": 14,
+    "fightTesterCooldown": 730,
+    "fightPunchDamage": 11,
+    "fightKickDamage": 16,
+    "fightBlockMultiplier": 0.4
   }
 }

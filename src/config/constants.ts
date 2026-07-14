@@ -3,6 +3,8 @@ export const WORKDAY_SCHEDULE = {
   officeStart: 10 * 60,
   lunchStart: 14 * 60,
   lunchEnd: 15 * 60,
+  fightStart: 15 * 60 + 15,
+  fightEnd: 16 * 60 + 15,
   teaStart: 16 * 60 + 30,
   teaEnd: 16 * 60 + 45,
   salaryHuntStart: 18 * 60 + 45,

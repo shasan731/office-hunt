@@ -16,7 +16,7 @@ describe('game systems', () => {
     expect(difficulty.corporate.supportMaxActive).toBe(3);
   });
   it('defines the requested office and break schedule', () => {
-    expect(WORKDAY_SCHEDULE).toMatchObject({ officeStart: 600, lunchStart: 840, lunchEnd: 900, teaStart: 990, teaEnd: 1005, salaryHuntStart: 1125, officeEnd: 1140 });
+    expect(WORKDAY_SCHEDULE).toMatchObject({ officeStart: 600, lunchStart: 840, lunchEnd: 900, fightStart: 915, fightEnd: 975, teaStart: 990, teaEnd: 1005, salaryHuntStart: 1125, officeEnd: 1140 });
   });
   it('moves through state and records performance', () => {
     const game = new GameStateManager('casual'); game.beginStage('coding'); game.recordBug(true); game.recordBug(false); game.caughtBySupport();
@@ -38,6 +38,12 @@ describe('game systems', () => {
     expect(game.addClue('qa')).toBe(false);
     expect(game.addClue('accounts')).toBe(true);
     expect(game.snapshot).toMatchObject({ clues: 2, score: 100, clueSources: ['qa', 'accounts'] });
+  });
+  it('records a tester-fight victory once and converts damage to energy loss', () => {
+    const game = new GameStateManager('normal');
+    game.completeTesterFight(64);
+    game.completeTesterFight(100);
+    expect(game.snapshot).toMatchObject({ testerDefeated: true, fightHealthRemaining: 64, energy: 93, score: 528 });
   });
   it('unlocks achievements from a completed state', () => {
     const game = new GameStateManager('corporate'); game.recordArrival(); game.recordBug(true); game.collectSalary(); game.setTime(1141); game.recordExit();

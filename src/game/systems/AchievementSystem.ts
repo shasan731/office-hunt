@@ -5,6 +5,7 @@ export const calculateAchievements = (state: Readonly<GameState>): string[] => {
   const unlocked: string[] = [];
   if (state.minutes && state.arrivalTime !== '--' && parseArrival(state.arrivalTime) < 600) unlocked.push('perfect-attendance');
   if (state.bugsFixed > 0 && state.bugsMissed === 0) unlocked.push('bug-destroyer');
+  if (state.testerDefeated) unlocked.push('qa-approved');
   if (state.clues <= 3 && state.salaryCollected) unlocked.push('hr-detective');
   if (state.salaryCollected) unlocked.push('salary-secured');
   const exit = parseArrival(state.exitTime);

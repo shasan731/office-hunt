@@ -3,6 +3,7 @@ import { BootScene } from '../game/scenes/BootScene';
 import { CodingScene } from '../game/scenes/CodingScene';
 import { CommuteScene } from '../game/scenes/CommuteScene';
 import { EscapeScene } from '../game/scenes/EscapeScene';
+import { FightScene } from '../game/scenes/FightScene';
 import { GameOverScene } from '../game/scenes/GameOverScene';
 import { HRSearchScene } from '../game/scenes/HRSearchScene';
 import { LobbyScene } from '../game/scenes/LobbyScene';
@@ -24,5 +25,5 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   input: { activePointers: 3 },
   dom: { createContainer: true },
-  scene: [BootScene, MainMenuScene, NameEntryScene, CommuteScene, GameOverScene, LobbyScene, CodingScene, LunchScene, TeaBreakScene, HRSearchScene, SalaryScene, EscapeScene, ResultsScene, PauseScene],
+  scene: [BootScene, MainMenuScene, NameEntryScene, CommuteScene, GameOverScene, LobbyScene, CodingScene, LunchScene, FightScene, TeaBreakScene, HRSearchScene, SalaryScene, EscapeScene, ResultsScene, PauseScene],
 };

@@ -31,7 +31,7 @@ export class HRSearchScene extends BaseScene {
     this.clueArrow = undefined;
     this.supportAttacks = undefined;
     this.hrRoute = 0;
-    this.setupWorld('6 / Find HR', 'Ask for clues. Hide near the server rack if support zombies attack.', 120, 610);
+    this.setupWorld('7 / Find HR', 'Ask for clues. Hide near the server rack if support zombies attack.', 120, 610);
     this.drawOffice(); this.createNpcs();
     this.supportAttacks = new SupportAttackSystem(this, {
       getPlayer: () => this.player,

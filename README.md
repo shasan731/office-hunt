@@ -1,6 +1,6 @@
 # Salary Chase
 
-A lightweight, colorful Phaser 3 office adventure. Commute through absurd traffic, mark attendance, repair urgent code, follow clues to a mobile HR employee, collect a fictional salary, and dodge “one small change” on the way out.
+A lightweight, colorful Phaser 3 office adventure. Commute through absurd traffic, mark attendance, repair urgent code, battle a Software Tester, follow clues to a mobile HR employee, collect a fictional salary, and dodge “one small change” on the way out.
 
 The commute is a 32-bit-inspired city crossing with pixel cars, buses, rickshaws, buildings, sidewalks, and a safer marked crossing. Vehicle collisions are fatal to the run and open a **You are late to the office** retry screen.
 
@@ -13,11 +13,12 @@ The complete game runs in the browser as a static Vite app—no backend, account
 3. Office Arrival
 4. Random coding minigame: Fix the Bugs, Connect the Logic, or Stop Production Errors
 5. Lunch Break food-scavenger adventure
-6. Tea Break mug-and-token quest
-7. Find HR across a complete office map
-8. Salary conversation
-9. Escape the Office
-10. Results, rank, achievements, and persistent high scores
+6. Retro Bug Bash: Developer vs Software Tester
+7. Tea Break mug-and-token quest
+8. Find HR across a complete office map
+9. Salary conversation
+10. Escape the Office
+11. Results, rank, achievements, and persistent high scores
 
 Office interiors and furniture use original programmatic 32-bit-inspired pixel art. During the HR hunt and escape, headset-wearing customer-support zombies may attack with urgent tickets. Hide near the server rack or filing cabinets marked **HIDE**, or keep moving until they lose interest.
 
@@ -25,6 +26,7 @@ Office interiors and furniture use original programmatic 32-bit-inspired pixel a
 
 - 10:00 AM — Office opens
 - 2:00–3:00 PM — Lunch adventure
+- 3:15–4:15 PM — Software Tester Bug Bash
 - 4:30–4:45 PM — Tea-break quest
 - 6:45 PM — Salary hunt begins
 - 7:00 PM — Office closes
@@ -77,6 +79,7 @@ The production output is written to `dist/`.
 
 - Move: Arrow keys or WASD
 - Interact: E or Space
+- Bug Bash: A/D to move, J or Space to punch, K to kick, S or Down Arrow to block
 - Pause: Escape
 - Mobile: on-canvas directional pad, interact button, and pause button
 

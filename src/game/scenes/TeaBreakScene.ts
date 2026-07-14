@@ -31,7 +31,7 @@ export class TeaBreakScene extends BaseScene {
     this.teaStall = undefined;
     this.cooldown = false;
     app.state.setTime(WORKDAY_SCHEDULE.teaStart);
-    this.setupWorld('5 / Tea Break', 'Find your mug and tea token, then reach the pantry by 4:45 PM.', 100, 590);
+    this.setupWorld('6 / Tea Break', 'Find your mug and tea token, then reach the pantry by 4:45 PM.', 100, 590);
     drawPixelFloor(this, 0xd8edf5, 0xc6e0ea);
     this.add.text(640, 125, '4:30 PM — THE OFFICE RUNS ON TEA AND UNVERIFIED ASSUMPTIONS', textStyle(18, '#071a2b')).setOrigin(0.5);
     addPixelRoom(this, 300, 400, 300, 210, colors.blue, 'YOUR DESK');

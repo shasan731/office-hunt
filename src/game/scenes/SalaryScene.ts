@@ -17,7 +17,7 @@ export class SalaryScene extends Phaser.Scene {
     addPixelCabinet(this, 135, 500, 'PAYROLL');
     addPixelDesk(this, 1035, 520, 150, 'HR DESK');
     addPixelPlant(this, 1140, 215);
-    this.add.text(640, 120, '7 / THE SALARY CONVERSATION', textStyle(30, '#071a2b')).setOrigin(0.5);
+    this.add.text(640, 120, '8 / THE SALARY CONVERSATION', textStyle(30, '#071a2b')).setOrigin(0.5);
     addPerson(this, 220, 350, colors.blue, 'YOU').setScale(1.5); addPerson(this, 1060, 350, colors.orange, 'HR').setScale(1.5);
     this.content = this.add.container(0, 0); this.showStep();
     applyPixelPolish(this, colors.green);

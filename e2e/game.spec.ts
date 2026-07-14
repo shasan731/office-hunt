@@ -118,6 +118,67 @@ test('pixel office escape and support-zombie attack initialize safely', async ({
   expect(await page.evaluate(() => window.__salaryChase?.scene.isActive('EscapeScene'))).toBe(true);
 });
 
+test('retro Bug Bash damages the tester, records a KO, and continues to tea break', async ({ page }) => {
+  test.setTimeout(60_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await startGame(page, 'Fight QA');
+  await page.evaluate(() => window.__salaryChase?.scene.start('FightScene'));
+  await waitForScene(page, 'FightScene');
+  await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as {
+      developer: { x: number };
+      tester: { x: number };
+      testerActionUntil: number;
+      playerActionUntil: number;
+      introLocked: boolean;
+      playerAttack: (kind: 'punch' | 'kick') => void;
+    };
+    scene.introLocked = false;
+    scene.developer.x = scene.tester.x - 100;
+    scene.testerActionUntil = Number.MAX_SAFE_INTEGER;
+    scene.playerActionUntil = 0;
+    scene.playerAttack('punch');
+  });
+  await expect.poll(() => page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { testerHealth: number };
+    return scene.testerHealth;
+  })).toBeLessThan(100);
+  await page.waitForTimeout(400);
+  await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as {
+      developer: { x: number };
+      tester: { x: number };
+      testerHealth: number;
+      playerActionUntil: number;
+      playerAttack: (kind: 'punch' | 'kick') => void;
+    };
+    scene.developer.x = scene.tester.x - 100;
+    scene.testerHealth = 1;
+    scene.playerActionUntil = 0;
+    scene.playerAttack('punch');
+  });
+  await expect.poll(() => page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { ended: boolean };
+    return scene.ended;
+  })).toBe(true);
+  await page.waitForTimeout(500);
+  const victory = await page.evaluate(() => {
+    const scene = window.__salaryChase?.scene.getScene('FightScene') as unknown as { ended: boolean; testerHealth: number };
+    return { ended: scene.ended, testerHealth: scene.testerHealth };
+  });
+  expect(victory.ended).toBe(true);
+  expect(victory.testerHealth).toBe(0);
+  expect(errors).toEqual([]);
+  await expect.poll(() => page.evaluate(() => {
+    const items = window.__salaryChase?.scene.getScene('FightScene').children.list as Array<{ type: string; text?: string }>;
+    return items.filter((item) => item.type === 'Text').map((item) => item.text ?? '');
+  })).toContain('DEVELOPER WINS');
+  await page.screenshot({ path: 'test-results/bug-bash-victory.png' });
+  await clickGame(page, 640, 480);
+  await waitForScene(page, 'TeaBreakScene');
+});
+
 test('restarting reused scenes does not retain stale gameplay objects', async ({ page }) => {
   test.setTimeout(60_000);
   await startGame(page, 'Restart QA');

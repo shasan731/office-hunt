@@ -32,7 +32,7 @@ export class EscapeScene extends BaseScene {
     this.supportAttacks = undefined;
     this.hidden = false;
     this.collisionCooldown = false;
-    this.setupWorld('8 / Escape', 'Reach EXIT. Use cabinets marked HIDE when support zombies attack.', 110, 610);
+    this.setupWorld('9 / Escape', 'Reach EXIT. Use cabinets marked HIDE when support zombies attack.', 110, 610);
     drawPixelFloor(this, 0xe8e2f2, 0xd8d0e7);
     for (let x = 260; x < 1100; x += 270) {
       addPixelDesk(this, x, 245, 155);

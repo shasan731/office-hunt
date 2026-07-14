@@ -1,5 +1,5 @@
 export type Difficulty = 'casual' | 'normal' | 'corporate';
-export type Stage = 'commute' | 'lobby' | 'coding' | 'lunch' | 'tea-break' | 'hr-search' | 'salary' | 'escape' | 'results';
+export type Stage = 'commute' | 'lobby' | 'coding' | 'lunch' | 'fight' | 'tea-break' | 'hr-search' | 'salary' | 'escape' | 'results';
 
 export interface AccessibilitySettings {
   reducedMotion: boolean;
@@ -52,6 +52,8 @@ export interface GameState {
   meetingsHit: number;
   attendanceMarked: boolean;
   lunchCompleted: boolean;
+  testerDefeated: boolean;
+  fightHealthRemaining: number;
   teaQuestCompleted: boolean;
   difficulty: Difficulty;
   unlockedThisRun: string[];
@@ -68,4 +70,11 @@ export interface DifficultyConfig {
   clueLimit: number;
   supportDelayScale: number;
   supportMaxActive: number;
+  fightPlayerSpeed: number;
+  fightTesterSpeed: number;
+  fightTesterDamage: number;
+  fightTesterCooldown: number;
+  fightPunchDamage: number;
+  fightKickDamage: number;
+  fightBlockMultiplier: number;
 }

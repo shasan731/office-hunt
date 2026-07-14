@@ -108,6 +108,6 @@ export class LunchScene extends BaseScene {
     app.state.completeLunch();
     app.state.setTime(WORKDAY_SCHEDULE.lunchEnd);
     app.audio.play('correct');
-    this.showDialog(app.state.snapshot.playerName, 'Lunch completed before the food entered a requirements meeting. +250 points and +25 energy.', () => this.scene.start('TeaBreakScene'));
+    this.showDialog(app.state.snapshot.playerName, 'Lunch completed before the food entered a requirements meeting. +250 points and +25 energy.', () => this.scene.start('FightScene'));
   }
 }

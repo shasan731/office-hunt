@@ -36,10 +36,10 @@ export abstract class BaseScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-E', () => this.interact());
   }
 
-  private keyToStage(): 'commute' | 'lobby' | 'coding' | 'lunch' | 'tea-break' | 'hr-search' | 'salary' | 'escape' | 'results' {
-    const map: Record<string, 'commute' | 'lobby' | 'coding' | 'lunch' | 'tea-break' | 'hr-search' | 'salary' | 'escape' | 'results'> = {
+  private keyToStage(): 'commute' | 'lobby' | 'coding' | 'lunch' | 'fight' | 'tea-break' | 'hr-search' | 'salary' | 'escape' | 'results' {
+    const map: Record<string, 'commute' | 'lobby' | 'coding' | 'lunch' | 'fight' | 'tea-break' | 'hr-search' | 'salary' | 'escape' | 'results'> = {
       CommuteScene: 'commute', LobbyScene: 'lobby', CodingScene: 'coding', HRSearchScene: 'hr-search',
-      LunchScene: 'lunch', TeaBreakScene: 'tea-break', SalaryScene: 'salary', EscapeScene: 'escape', ResultsScene: 'results',
+      LunchScene: 'lunch', FightScene: 'fight', TeaBreakScene: 'tea-break', SalaryScene: 'salary', EscapeScene: 'escape', ResultsScene: 'results',
     };
     return map[this.scene.key] ?? 'commute';
   }
